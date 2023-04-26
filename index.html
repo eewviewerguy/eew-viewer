@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>緊急地震速報</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+        h1, h2 {
+            margin: 0;
+            padding: 10px;
+            background-color: #f0f0f0;
+        }
+        #earthquake-info, #earthquake-list {
+            padding: 10px;
+        }
+        @media (max-width: 600px) {
+            body {
+                font-size: 14px;
+            }
+        }
+        .warn {
+            animation: blink 1s linear infinite;
+        }
+        @keyframes blink {
+            50% {
+                background-color: red;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>緊急地震速報</h1>
+    <div id="earthquake-info"></div>
+    <h2>地震情報</h2>
+    <div id="earthquake-list"></div>
+    <h2>強震モニタ</h2>
+    <iframe src="https://eqdata.sakura.ne.jp/kyoshin/2sec_i.html" width="600" height="450"></iframe>
+    <script>
+    async function getEarthquakeInfo() {
+        const response = await fetch('https://api.wolfx.jp/jma_eew.json');
+        const data = await response.json();
+        const earthquakeInfo = document.getElementById('earthquake-info');
+        if (data.isCancel) {
+            earthquakeInfo.innerHTML = `<p>緊急地震速報は取り消されました。</p>`;
+            earthquakeInfo.classList.remove('warn');
+        } else if (data.isTraining || Date.now() - new Date(data.AnnouncedTime).getTime() > 300000) {
+            earthquakeInfo.innerHTML = `<p>緊急地震速報は発表されていません。</p>`;
+            earthquakeInfo.classList.remove('warn');
+        } else {
+            let info = `
+                <p>タイトル: ${data.isWarn ? data.Title.replace('予報', '警報') : data.Title }</p>
+                <p>震源地: ${data.Hypocenter}</p>
+                <p> ${data.isFinal ? (data.Serial ? `最終第${data.Serial}報` : '最終報') : (data.Serial ? `第${data.Serial}報` : '未定義')}</p>
+                <p>予想最大震度: ${data.MaxIntensity}</p>
+            `;
+            if (!data.isAssumption) {
+                info += `
+                    <p>マグニチュード: ${data.Magunitude}</p>
+                    <p>深さ: ${data.Depth} km</p>
+                    <p>${new Date(data.OriginTime).toLocaleString()} 発生</p>
+                    <p>精度情報 震源: ${data.Accuracy.Epicenter}, 深さ: ${data.Accuracy.Depth}, マグニチュード: ${data.Accuracy.Magnitude.replace('（最大5 点）', '')}</p>
+                `;
+            } else {
+                info += `
+                    <p>検知時刻: ${new Date(data.OriginTime).toLocaleString()}</p>
+                    <p>仮定震源要素のため、震源の深さとM不明</p>
+                `;
+            }
+            earthquakeInfo.innerHTML = info;
+            if (data.isWarn) {
+                earthquakeInfo.classList.add('warn');
+            } else {
+                earthquakeInfo.classList.remove('warn');
+            }
+        }
+    }
+
+        async function getEarthquakeList() {
+            const response = await fetch('https://api.wolfx.jp/jma_eqlist.json');
+            const data = await response.json();
+            const earthquakeList = document.getElementById('earthquake-list');
+            if (data.No1) {
+                earthquakeList.innerHTML = `
+                    <p>震源地: ${data.No1.location}</p>
+                    <p>${data.No1.time} 頃発生</p>
+                    <p>マグニチュード: ${data.No1.magnitude}</p>
+                    <p>最大震度: ${data.No1.shindo}</p>
+                    <p>深さ: ${data.No1.depth}</p>
+                    <p>津波情報: ${data.No1.info}</p>
+                `;
+            } else {
+                earthquakeList.innerHTML = `<p>地震情報はありません。</p>`;
+            }
+        }
+
+        getEarthquakeInfo();
+        getEarthquakeList();
+        setInterval(getEarthquakeInfo, 1500);
+        setInterval(getEarthquakeList, 2000);
+    </script>
+</body>
+</html>
