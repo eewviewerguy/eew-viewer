@@ -1,134 +1,148 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>緊急地震速報</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-      body {
-            font-family: sans-serif;
-        }
-        h1, h2 {
-            margin: 0;
-            padding: 10px;
-            background-color: #f0f0f0;
-        }
-        #earthquake-info, #earthquake-list {
-            padding: 10px;
-        }
-        @media (max-width: 600px) {
-            body {
-                font-size: 14px;
-            }
-        }
-        .warn {
-            animation: blink 1s linear infinite;
-        }
-        @keyframes blink {
-            50% {
-                background-color: red;
-            }
-        }
-    </style>
-</head>
-<body>
-    <h1>緊急地震速報</h1>
-    <div id="earthquake-info"></div>
-    <h2>地震情報</h2>
-    <div id="earthquake-list"></div>
-    <h2>強震モニタ</h2>
-    <iframe src="https://eqdata.sakura.ne.jp/kyoshin/2sec_i.html" width="600" height="450"></iframe>
-    <script>
-    async function getEarthquakeInfo() {
-        const response = await fetch('https://api.wolfx.jp/jma_eew.json');
-        const data = await response.json();
-        const earthquakeInfo = document.getElementById('earthquake-info');
-        if (data.isCancel) {
-            earthquakeInfo.innerHTML = `<p>緊急地震速報は取り消されました。</p>`;
-            earthquakeInfo.classList.remove('warn');
-        } else if (data.isTraining || Date.now() - new Date(data.AnnouncedTime).getTime() > 300000) {
-            earthquakeInfo.innerHTML = `<p>緊急地震速報は発表されていません。</p>`;
-            earthquakeInfo.classList.remove('warn');
-        } else {
-            let info = `
-                <p>タイトル: ${data.isWarn ? data.Title.replace('予報', '警報') : data.Title }</p>
-                <p>震源地: ${data.Hypocenter}</p>
-                <p> ${data.isFinal ? (data.Serial ? `最終第${data.Serial}報` : '最終報') : (data.Serial ? `第${data.Serial}報` : '未定義')}</p>
-                <p>予想最大震度: ${data.MaxIntensity}</p>
-            `;
-            if (!data.isAssumption) {
-                info += `
-                    <p>マグニチュード: ${data.Magunitude}</p>
-                    <p>深さ: ${data.Depth}km</p>
-                    <p>${new Date(data.OriginTime).toLocaleString()} 発生</p>
-                    <p>精度情報 震源: ${data.Accuracy.Epicenter}, 深さ: ${data.Accuracy.Depth}, マグニチュード: ${data.Accuracy.Magnitude.replace('（最大5 点）', '')}</p>
-                `;
-            } else {
-                info += `
-                    <p>${new Date(data.OriginTime).toLocaleString()}頃検知</p>
-                    <p>仮定震源要素のため、震源の深さとM不明</p>
-                `;
-            }
-            earthquakeInfo.innerHTML = info;
-            if (data.isWarn) {
-                earthquakeInfo.classList.add('warn');
-            } else {
-                earthquakeInfo.classList.remove('warn');
-            }
-        }
-    }
-
-        async function getEarthquakeList() {
-    try {
-        const response = await fetch('https://dev.narikakun.net/webapi/earthquake/post_data.json');
-        const data = await response.json();
-        const earthquakeList = document.getElementById('earthquake-list');
-        if (data.Head.Title === '震度速報') {
-            let intensityObservations = '';
-            if (data.Body.Intensity && data.Body.Intensity.Observation && data.Body.Intensity.Observation.Pref) {
-                for (const pref of data.Body.Intensity.Observation.Pref) {
-                    if (pref.Area) {
-                        for (const area of pref.Area) {
-                            intensityObservations += `<p>${area.Name}: 震度${area.MaxInt}</p>`;
-                        }
-                    }
-                }
-            }
-            earthquakeList.innerHTML = `
-                <p>震度速報</p>
-                ${intensityObservations}
-                <p>情報: ${data.Body.Comments.Observation}</p>
-            `;
-        } else if (data.Head.Title === '震源に関する情報') {
-            earthquakeList.innerHTML = `
-                <p>震源に関する情報</p>
-                <p>震源地: ${data.Body.Earthquake.Hypocenter.Name}</p>
-                <p>${data.Body.Earthquake.OriginTime.replace(/-/g, '/')} 頃発生</p>
-                <p>マグニチュード: ${data.Body.Earthquake.Magnitude}</p>
-                <p>深さ: ${data.Body.Earthquake.Hypocenter.Depth} km</p>
-                <p>津波情報: ${data.Body.Comments.Observation}</p>
-            `;
-        } else if (data.Body) {
-            earthquakeList.innerHTML = `
-                <p>震源地: ${data.Body.Earthquake.Hypocenter.Name}</p>
-                <p>${data.Body.Earthquake.OriginTime.replace(/-/g, '/')} 頃発生</p>
-                <p>マグニチュード: ${data.Body.Earthquake.Magnitude}</p>
-                <p>最大震度: ${data.Body.Intensity.Observation.MaxInt}</p>
-                <p>深さ: ${data.Body.Earthquake.Hypocenter.Depth} km</p>
-                <p>津波情報: ${data.Body.Comments.Observation}</p>
-            `;
-        } else {
-            earthquakeList.innerHTML = `<p>地震情報はありません。</p>`;
-        }
-    } catch (error) {
-        console.error(error);
-        const earthquakeList = document.getElementById('earthquake-list');
-        earthquakeList.innerHTML = `<p>データの取得に失敗しました。</p>`;
-    }
-}
-        getEarthquakeInfo();
-        getEarthquakeList();
-        setInterval(getEarthquakeInfo, 1500);
-        setInterval(getEarthquakeList, 3000);
-    </script>
-</body>
+   <head>
+      <title>緊急地震速報</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>
+         body {
+         font-family: sans-serif;
+         }
+         h1, h2 {
+         margin: 0;
+         padding: 10px;
+         background-color: #f0f0f0;
+         }
+         #earthquake-info, #earthquake-list {
+         padding: 10px;
+         }
+         @media (max-width: 600px) {
+         body {
+         font-size: 14px;
+         }
+         }
+         .warn {
+         animation: blink 1s linear infinite;
+         }
+         @keyframes blink {
+         50% {
+         background-color: red;
+         }
+         }
+      </style>
+   </head>
+   <body>
+      <h1>緊急地震速報</h1>
+      <div id="earthquake-info"></div>
+      <h2>地震情報</h2>
+      <div id="earthquake-list"></div>
+      <h2>強震モニタ</h2>
+      <iframe src="https://eqdata.sakura.ne.jp/kyoshin/2sec_i.html" width="600" height="450"></iframe>
+      <script>
+         function formatDate(dateString) {
+         const year = dateString.slice(0, 4);
+         const month = dateString.slice(4, 6);
+         const day = dateString.slice(6, 8);
+         const hour = dateString.slice(8, 10);
+         const minute = dateString.slice(10, 12);
+         const second = dateString.slice(12, 14);
+         return new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}`);
+         }
+         async function getEarthquakeInfo(api1 = true, api2 = ) {
+         let data;
+         if (api1) {
+         const response = await fetch('https://api.wolfx.jp/jma_eew.json');
+         data = await response.json();
+         }
+         let data2;
+         if (api2) {
+         const response2 = await fetch('https://api.wolfx.jp/nied_eew.json');
+         data2 = await response2.json();
+         }
+         let displayData;
+         if (data && data2) {
+         if (new Date(data.AnnouncedTime).getTime() > new Date(data2.report_time).getTime()) {
+         displayData = data;
+         } else if (new Date(data.AnnouncedTime).getTime() < new Date(data2.report_time).getTime()) {
+         displayData = data2;
+         } else {
+         displayData = data;
+         }
+         } else if (data) {
+         displayData = data;
+         } else if (data2) {
+         displayData = data2;
+         } else {
+         return;
+         }
+         const earthquakeInfo = document.getElementById('earthquake-info');
+         if (displayData.isCancel || displayData.is_cancel) {
+         earthquakeInfo.innerHTML = `<p>緊急地震速報は取り消されました。</p>`;
+         earthquakeInfo.classList.remove('warn');
+         } else if (displayData.isTraining || displayData.is_training || Date.now() - new Date(displayData.AnnouncedTime || displayData.report_time).getTime() > 300000000000000000000000000000000000000000000000000000) {
+         earthquakeInfo.innerHTML = `<p>緊急地震速報は発表されていません。</p>`;
+         earthquakeInfo.classList.remove('warn');
+         } else {
+         let info = ` <p>タイトル: ${displayData.isWarn || displayData.alertflg === '警報' ? (displayData.Title || displayData.region_name).replace('予報', '警報') : (displayData.Title || displayData.region_name) }</p> <p>震源地: ${displayData.Hypocenter || displayData.region_name}</p> <p> ${displayData.isFinal || displayData.is_final ? ((displayData.Serial || displayData.report_num) ? `最終第${(displayData.Serial || displayData.report_num)}報` : '最終報') : ((displayData.Serial || displayData.report_num) ? `第${(displayData.Serial || displayData.report_num)}報` : '未定義')}</p> <p>予想最大震度: ${displayData.MaxIntensity || displayData.calcintensity}</p> `;
+             if (!displayData.isAssumption) {
+           info += ` <p>マグニチュード: ${displayData.Magunitude || displayData.magunitude}</p> <p>深さ: ${(displayData.Depth ? (displayData.Depth + 'km') : displayData.depth)}</p> <p>${new Date(displayData.OriginTime ? (displayData.AnnouncedTime || formatDate(displayData.OriginTime)) : formatDate(displayData.origin_time)).toLocaleString()
+         } 発生</p> `;
+         
+           if (displayData.Accuracy) {
+             info += `<p>精度情報 震源: ${displayData.Accuracy.Epicenter}, 深さ: ${displayData.Accuracy.Depth}, マグニチュード: ${displayData.Accuracy.Magnitude.replace('（最大5 点）', '')}</p>`;
+           }
+         } else {
+           info += ` <p>${new Date(displayData.OriginTime ? (displayData.AnnouncedTime || formatDate(displayData.OriginTime)) : formatDate(displayData.origin_time)).toLocaleString()}頃検知</p> <p>仮定震源要素のため、震源の深さとM不明</p> `;
+         }
+         earthquakeInfo.innerHTML = info;
+         if (displayData.isWarn || displayData.alertflg === '警報') {
+           earthquakeInfo.classList.add('warn');
+         } else {
+           earthquakeInfo.classList.remove('warn');
+         }
+         }
+         }
+         async function getEarthquakeList() {
+         try {
+             const response = await fetch('https://dev.narikakun.net/webapi/earthquake/last/震度速報.json');
+             const data = await response.json();
+             const earthquakeList = document.getElementById('earthquake-list');
+             if (data.Head.Title === '震度速報') {
+                 let intensityObservations = '';
+                 if (data.Body.Intensity && data.Body.Intensity.Observation && data.Body.Intensity.Observation.Pref) {
+                     for (const pref of data.Body.Intensity.Observation.Pref) {
+                         if (pref.Area) {
+                             for (const area of pref.Area) {
+                                 intensityObservations += `<p>${area.Name}: 震度${area.MaxInt}</p>`;
+                             }
+                         }
+                     }
+                 }
+                 earthquakeList.innerHTML = `
+                     <p>震度速報</p>
+                     ${intensityObservations}
+                     <p>情報: ${data.Body.Comments.Observation}</p>
+                 `;  } else if (data.Body) {
+                 earthquakeList.innerHTML = `
+                     <p>震源地: ${data.Body.Earthquake.Hypocenter.Name}</p>
+                     <p>${data.Body.Earthquake.OriginTime.replace(/-/g, '/')} 頃発生</p>
+                     <p>マグニチュード: ${data.Body.Earthquake.Magnitude}</p>
+                     <p>最大震度: ${data.Body.Intensity.Observation.MaxInt}</p>
+                     <p>深さ: ${data.Body.Earthquake.Hypocenter.Depth} km</p>
+                     <p>津波情報: ${data.Body.Comments.Observation}</p>
+                 `;
+             } else {
+                 earthquakeList.innerHTML = `<p>地震情報はありません。</p>`;
+             }
+         } catch (error) {
+             console.error(error);
+             const earthquakeList = document.getElementById('earthquake-list');
+             earthquakeList.innerHTML = `<p>データの取得に失敗しました。</p>`;
+         }
+         }
+             getEarthquakeInfo();
+             getEarthquakeList();
+             setInterval(getEarthquakeInfo, 1500);
+             setInterval(getEarthquakeList, 3000);
+      </script>
+   </body>
 </html>
