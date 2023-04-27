@@ -47,7 +47,7 @@
          const second = dateString.slice(12, 14);
          return new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}`);
          }
-         async function getEarthquakeInfo(api1 = true, api2 = true) {
+         async function getEarthquakeInfo(api1 = false, api2 = true) {
   let data;
   if (api1) {
     const response = await fetch('https://api.wolfx.jp/jma_eew.json');
@@ -78,7 +78,7 @@
          if (displayData.isCancel || displayData.is_cancel) {
          earthquakeInfo.innerHTML = `<p>緊急地震速報は取り消されました。</p>`;
          earthquakeInfo.classList.remove('warn');
-         } else if (displayData.isTraining || displayData.is_training || Date.now() - new Date(displayData.AnnouncedTime || displayData.report_time).getTime() > 300000) {
+         } else if (displayData.isTraining || displayData.is_training || Date.now() - new Date(displayData.AnnouncedTime || displayData.report_time).getTime() > 300000000000000000000000000000000000000000000000000000) {
          earthquakeInfo.innerHTML = `<p>緊急地震速報は発表されていません。</p>`;
          earthquakeInfo.classList.remove('warn');
          } else {
