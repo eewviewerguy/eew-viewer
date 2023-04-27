@@ -103,7 +103,7 @@
          }
  async function getEarthquakeList() {
          try {
-             const response = await fetch('https://dev.narikakun.net/webapi/earthquake/last/震度速報.json');
+             const response = await fetch('https://dev.narikakun.net/webapi/earthquake/post_data.json');
              const data = await response.json();
              const earthquakeList = document.getElementById('earthquake-list');
              if (data.Head.Title === '震度速報') {
