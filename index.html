@@ -128,7 +128,7 @@
                      <p>マグニチュード: ${data.Body.Earthquake.Magnitude}</p>
                      <p>最大震度: ${data.Body.Intensity.Observation.MaxInt}</p>
                      <p>深さ: ${data.Body.Earthquake.Hypocenter.Depth} km</p>
-                     <p>津波情報: ${data.Body.Comments.Observation}</p>
+                     <p>情報: ${data.Body.Comments.Observation}</p>
                  `;
              } else {
                  earthquakeList.innerHTML = `<p>地震情報はありません。</p>`;
