@@ -6,3 +6,5 @@ EEW VIEWERのサイトは[こちら](https://shin20234.github.io/eewviewer/)で�
 
 情報源: 緊急地震速報 - wolfx api、地震情報 - nTool Earthquake API
 
+アップデート2023/04/27
+内容:niedからの受信に対応。
