@@ -13,3 +13,6 @@ EEW VIEWERのサイトは[こちら](https://shin20234.github.io/eewviewer/)で�
 
 bing aiで作成したものなので、品質は....
 あとreadmeも...
+
+注意事項 
+このアプリを利用する上で、一部の情報は高度な緊急地震速報に関する知識を必要とします。[緊急地震速報の特性や限界](https://www.data.jma.go.jp/eew/data/nc/shikumi/tokusei.html#1)を理解した上でご利用ください。また、利用先のAPIがメンテナンス中の場合は、受信、取得ができません。
