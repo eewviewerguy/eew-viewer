@@ -4,7 +4,7 @@
 
 -EEW VIEWERのサイトは[こちら](https://shin20234.github.io/eewviewer/)です。また、サーバーがダウンした場合でも安心してご利用いただけるよう、[別サーバーも](https://syenitic-functions.000webhostapp.com/)ご用意しております。
 
-情報源: 緊急地震速報 - wolfx api、地震情報 - nTool Earthquake API
+-情報源: 緊急地震速報 - wolfx api、地震情報 - nTool Earthquake API
 
 -アップデート2023/04/27
 -内容:niedからの受信に対応。
