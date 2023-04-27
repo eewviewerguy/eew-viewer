@@ -2,7 +2,7 @@
 
 -EEW VIEWERの特徴は、そのシンプルさです。スマートフォンでもPCでも、ブラウザが動作すれば、どのようなデバイスでも動作します。
 
--EEW VIEWERのサイトは[こちら](https://shin20234.github.io/eewviewer/)です。また、サーバーがダウンした場合でも良いように、[別サーバーも](https://syenitic-functions.000webhostapp.com/)あります。
+-EEW VIEWERのサイトは[こちら](https://shin20234.github.io/eewviewer/)です。また、サーバーがダウンした場合でも良いように、[別サーバー](https://syenitic-functions.000webhostapp.com/)もあります。
 
 -情報源: 緊急地震速報 - wolfx api、地震情報 - nTool Earthquake API
 
