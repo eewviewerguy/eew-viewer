@@ -86,8 +86,8 @@
          earthquakeInfo.classList.remove('warn');
          } else {
          let info = ` <p>タイトル: ${displayData.isWarn || displayData.alertflg === '警報' ? (displayData.Title || displayData.region_name).replace('予報', '警報') : (displayData.Title || displayData.region_name) }</p> <p>震源地: ${displayData.Hypocenter || displayData.region_name}</p> <p> ${displayData.isFinal || displayData.is_final ? ((displayData.Serial || displayData.report_num) ? `最終第${(displayData.Serial || displayData.report_num)}報` : '最終報') : ((displayData.Serial || displayData.report_num) ? `第${(displayData.Serial || displayData.report_num)}報` : '未定義')}</p> <p>予想最大震度: ${displayData.MaxIntensity || displayData.calcintensity}</p> `;
-             if (!displayData.isAssumption) {
-         info += ` <p>マグニチュード: ${displayData.Magunitude || displayData.magunitude}</p> <p>深さ: ${(displayData.Depth ? (displayData.Depth + 'km') : displayData.depth)}</p> <p>${new Date(displayData.OriginTime ? formatDate(displayData.OriginTime) : formatDate(displayData.origin_time)).toLocaleString()} 発生</p> `;
+            if (!displayData.isAssumption) {
+    info += ` <p>マグニチュード: ${displayData.Magunitude || displayData.magunitude}</p> <p>深さ: ${(displayData.Depth ? (displayData.Depth + 'km') : displayData.depth)}</p> <p>${displayData.OriginTime || displayData.origin_time} 発生</p> `;
            if (displayData.Accuracy) {
              info += `<p>精度情報 震源: ${displayData.Accuracy.Epicenter}, 深さ: ${displayData.Accuracy.Depth}, マグニチュード: ${displayData.Accuracy.Magnitude.replace('（最大5 点）', '')}</p>`;
            }
