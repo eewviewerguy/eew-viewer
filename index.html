@@ -81,7 +81,7 @@
          if (displayData.isCancel || displayData.is_cancel) {
          earthquakeInfo.innerHTML = `<p>緊急地震速報は取り消されました。</p>`;
          earthquakeInfo.classList.remove('warn');
-         } else if (displayData.isTraining || displayData.is_training || Date.now() - new Date(displayData.AnnouncedTime || displayData.report_time).getTime() > 300000) {
+         } else if (displayData.isTraining || displayData.is_training || Date.now() - new Date(displayData.AnnouncedTime || displayData.report_time).getTime() > 30000000000000000000000000000) {
          earthquakeInfo.innerHTML = `<p>緊急地震速報は発表されていません。</p>`;
          earthquakeInfo.classList.remove('warn');
          } else {
