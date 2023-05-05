@@ -72,7 +72,7 @@ async function getEarthquakeInfo(api1 = true, api2 = true) {
     if (displayData.isCancel || displayData.is_cancel) {
         earthquakeInfo.innerHTML = `<p>緊急地震速報は取り消されました。</p>`;
         earthquakeInfo.classList.remove('warn');
-    } else if (displayData.isTraining || displayData.is_training || Date.now() - new Date(displayData.AnnouncedTime || displayData.report_time).getTime() > 3000000000000000000000000000000000000000) {
+    } else if (displayData.isTraining || displayData.is_training || Date.now() - new Date(displayData.AnnouncedTime || displayData.report_time).getTime() > 300000) {
         earthquakeInfo.innerHTML = `<p>緊急地震速報は発表されていません。</p>`;
         earthquakeInfo.classList.remove('warn');
     } else {
