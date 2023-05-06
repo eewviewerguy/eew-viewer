@@ -41,7 +41,7 @@
       <h2>強震モニタ</h2>
       <iframe src="https://eqdata.sakura.ne.jp/kyoshin/2sec_i.html" width="600" height="450"></iframe>
       <script>
-async function getEarthquakeInfo(api1 = true, api2 = true) {
+async function getEarthquakeEarlyWaring(api1 = true, api2 = true) {
     let data;
     if (api1) {
         const response = await fetch('https://api.wolfx.jp/jma_eew.json');
@@ -120,7 +120,7 @@ function formatDate(dateString) {
     return new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}`);
 }
 
-async function getEarthquakeList() {
+async function getEarthquakeInformation() {
   try {
     const response = await fetch('https://dev.narikakun.net/webapi/earthquake/post_data.json', {
       cache: 'no-store'
@@ -161,10 +161,10 @@ async function getEarthquakeList() {
     earthquakeList.innerHTML = `<p>データの取得に失敗しました。</p>`;
   }
 }
-             getEarthquakeInfo();
-             getEarthquakeList();
-             setInterval(getEarthquakeInfo, 1500);
-             setInterval(getEarthquakeList, 5000);
+             getEarthquakeEarlyWaring();
+             getEarthquakeInformation();
+             setInterval(getEarthquakeEarlyWaring, 1500);
+             setInterval(getEarthquakeInformation, 5000);
       </script>
    </body>
 </html>
