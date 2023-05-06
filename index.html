@@ -41,7 +41,7 @@
       <h2>強震モニタ</h2>
       <iframe src="https://eqdata.sakura.ne.jp/kyoshin/2sec_i.html" width="600" height="450"></iframe>
       <script>
-async function getEarthquakeInfo(api1 = true, api2 = true) {
+async function getEarthquakeInfo(api1 = false, api2 = true) {
     let data;
     if (api1) {
         const response = await fetch('https://api.wolfx.jp/jma_eew.json');
@@ -76,8 +76,7 @@ async function getEarthquakeInfo(api1 = true, api2 = true) {
         earthquakeInfo.innerHTML = `<p>緊急地震速報は発表されていません。</p>`;
         earthquakeInfo.classList.remove('warn');
     } else {
-        let info =
-            ` <p>タイトル: ${displayData.isWarn || displayData.alertflg === '警報' ? (displayData.Title || displayData.region_name).replace('予報', '警報') : (displayData.Title || displayData.region_name)}</p> <p>震源地: ${displayData.Hypocenter || displayData.region_name}</p> <p>${displayData.isFinal || displayData.is_final ? ((displayData.Serial || displayData.report_num) ? `最終第${(displayData.Serial || displayData.report_num)}報` : '最終報') : ((displayData.Serial || displayData.report_num) ? `第${(displayData.Serial || displayData.report_num)}報` : '未定義')}</p> <p>予想最大震度: ${displayData.MaxIntensity || displayData.calcintensity}</p> `;
+        let info = ` <p>${displayData.isWarn || displayData.alertflg === '警報' ? '緊急地震速報(警報)' : '緊急地震速報(予報)'}</p> <p>震源地: ${displayData.Hypocenter || displayData.region_name}</p> <p>${displayData.isFinal || displayData.is_final ? ((displayData.Serial || displayData.report_num) ? `最終第${(displayData.Serial || displayData.report_num)}報` : '最終報') : ((displayData.Serial || displayData.report_num) ? `第${(displayData.Serial || displayData.report_num)}報` : '未定義')}</p> <p>予想最大震度: ${displayData.MaxIntensity || displayData.calcintensity}</p> `;
         if (!displayData.isAssumption) {
             info += ` <p>マグニチュード: ${displayData.Magunitude || displayData.magunitude}</p> <p>深さ: ${(displayData.Depth ? (displayData.Depth + 'km') : displayData.depth)}</p> `;
             if (displayData.OriginTime) {
