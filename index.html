@@ -92,11 +92,11 @@ async function getEarthquakeInfo(api1 = true, api2 = true) {
             info += ` <p>${formatDate(displayData.OriginTime ? (displayData.AnnouncedTime || formatDate(displayData.OriginTime)) : formatDate(displayData.origin_time)).toLocaleString()}頃検知</p> <p>仮定震源要素のため、震源の深さおよびM不明</p> `;
         }
         if (displayData.WarnArea) {
-            info += `<p>地域ごとの震度(気象庁発表)</p><p>`;
+            info += `<p>地域ごとの予想震度(気象庁発表)</p><p>`;
             for (const area of displayData.WarnArea) {
                 info += `${area.Chiiki} ${area.Shindo1}`;
                 if (area.Type === '警報') {
-                    info += ` -警報`;
+                    info += ` - 警報`;
                 }
                 info += `<br>`;
             }
