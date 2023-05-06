@@ -41,7 +41,7 @@
       <h2>強震モニタ</h2>
       <iframe src="https://eqdata.sakura.ne.jp/kyoshin/2sec_i.html" width="600" height="450"></iframe>
       <script>
-async function getEarthquakeInfo(api1 = false, api2 = true) {
+async function getEarthquakeInfo(api1 = true, api2 = true) {
     let data;
     if (api1) {
         const response = await fetch('https://api.wolfx.jp/jma_eew.json');
