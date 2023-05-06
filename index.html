@@ -88,7 +88,7 @@ async function getEarthquakeEarlyWaring(api1 = true, api2 = true) {
         info += `<p>精度情報 震源: ${displayData.Accuracy.Epicenter}, 深さ: ${displayData.Accuracy.Depth}, マグニチュード: ${displayData.Accuracy.Magnitude.replace('（最大5 点）', '')}</p>`;
         }
     } else {
-         info += ` <p>${formatDate(displayData.OriginTime ? (displayData.AnnouncedTime || formatDate(displayData.OriginTime)) : formatDate(displayData.origin_time)).toLocaleString()}頃検知</p> <p>仮定震源要素のため、震源の深さおよびM不明</p> `;
+         info += ` <p>${displayData.OriginTime}頃検知</p> <p>仮定震源要素のため、震源の深さおよびM不明</p> `;
     }
     if (displayData.WarnArea && displayData.WarnArea.length > 0) {
         info += `<p>地域ごとの予想震度(気象庁発表)</p><p>`;
