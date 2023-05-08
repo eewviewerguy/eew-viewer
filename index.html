@@ -146,12 +146,24 @@ async function getEarthquakeInformation() {
         ${intensityObservations}
         <p>情報: ${data.Body.Comments.Observation}</p>
       `;
-    } else if (data.Body) {
+    } else if (data.Control.Title === '震源に関する情報') {
       earthquakeList.innerHTML = `
         <p>震源地: ${data.Body.Earthquake.Hypocenter.Name}</p>
         <p>${data.Body.Earthquake.OriginTime.replace(/-/g, '/')} 頃発生</p>
         <p>マグニチュード: ${data.Body.Earthquake.Magnitude}</p>
-        <p>最大震度: ${data.Body.Intensity.Observation.MaxInt}</p>
+        <p>深さ: ${data.Body.Earthquake.Hypocenter.Depth} km</p>
+        <p>情報: ${data.Body.Comments.Observation}</p>
+      `;
+    } else if (data.Body) {
+      let maxIntensity = '';
+      if (data.Body.Intensity && data.Body.Intensity.Observation && data.Body.Intensity.Observation.MaxInt) {
+        maxIntensity = `<p>最大震度: ${data.Body.Intensity.Observation.MaxInt}</p>`;
+      }
+      earthquakeList.innerHTML = `
+        <p>震源地: ${data.Body.Earthquake.Hypocenter.Name}</p>
+        <p>${data.Body.Earthquake.OriginTime.replace(/-/g, '/')} 頃発生</p>
+        <p>マグニチュード: ${data.Body.Earthquake.Magnitude}</p>
+        ${maxIntensity}
         <p>深さ: ${data.Body.Earthquake.Hypocenter.Depth} km</p>
         <p>情報: ${data.Body.Comments.Observation}</p>
       `;
@@ -164,6 +176,7 @@ async function getEarthquakeInformation() {
     earthquakeList.innerHTML = `<p>データの取得に失敗しました。</p>`;
   }
 }
+         
              getEarthquakeEarlyWaring();
              getEarthquakeInformation();
              setInterval(getEarthquakeEarlyWaring, 1500);
