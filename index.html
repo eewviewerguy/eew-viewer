@@ -47,7 +47,8 @@
       <iframe src="https://eqdata.sakura.ne.jp/kyoshin/2sec_i.html" width="600" height="450"></iframe>
       <label for="user-location">現在地:</label>
       <input type="text" id="user-location">
-      <button id="save-button">保存</button>
+      <button id="save-button">保存</button><p id="location"></p>
+
       <script>
 async function getEarthquakeEarlyWaring(api1 = true, api2 = true) {
     let data;
@@ -147,6 +148,14 @@ function getUserLocationFromCookie() {
     return cookieValue ? decodeURIComponent(cookieValue) : null;
 }
 
+const locationElement = document.getElementById('location');
+const userLocation = getUserLocationFromCookie();
+if (userLocation) {
+    locationElement.textContent = `現在地は ${userLocation}です`;
+} else {
+    locationElement.textContent = '現在地は登録されていません。.';
+}
+
 document.getElementById('save-button').addEventListener('click', () => {
     const userLocation = document.getElementById('user-location').value;
     document.cookie = `userLocation=${encodeURIComponent(userLocation)}; path=/`;
@@ -164,7 +173,7 @@ document.getElementById('save-button').addEventListener('click', () => {
 　}　
 async function getEarthquakeInformation() {
   try {
-    const response = await fetch('https://dev.narikakun.net/webapi/earthquake/post_data.json', {
+    const response = await fetch('https://mocki.io/v1/e9415185-b238-44f7-a49e-86a8ee9d517f', {
       cache: 'no-store'
     });
     const data = await response.json();
