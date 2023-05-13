@@ -158,8 +158,11 @@ if (userLocation) {
 
 document.getElementById('save-button').addEventListener('click', () => {
     const userLocation = document.getElementById('user-location').value;
-    document.cookie = `userLocation=${encodeURIComponent(userLocation)}; path=/`;
+    const date = new Date();
+    date.setFullYear(date.getFullYear() + 1);
+    document.cookie = `userLocation=${encodeURIComponent(userLocation)}; expires=${date.toUTCString()}; path=/`;
 });
+
 
       
       function formatDate(dateString) {
