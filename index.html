@@ -295,7 +295,6 @@ async function getEarthquakeInformation() {
     earthquakeList.innerHTML = `<p>データの取得に失敗しました。</p>`;
   }
 }
-
 main();
 getEarthquakeInformation();
 
@@ -310,7 +309,7 @@ function callEarthquakeInformation() {
     setTimeout(callEarthquakeInformation, 5000);
 }
 
-setTimeout(callEarthquakeInformation 5000);
+setTimeout(callEarthquakeInformation, 5000);
 
       </script>
    </body>
