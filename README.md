@@ -2,7 +2,7 @@
 
 -EEW VIEWERの特徴は、そのシンプルさです。スマートフォンでもPCでも、ブラウザが動作すれば、どのようなデバイスでも動作します。
 
--情報源: 緊急地震速報 - wolfx api、地震情報 - nTool Earthquake API
+-情報源: 緊急地震速報 - wolfx api -iedred api 地震情報 - nTool Earthquake API
 
 -bing aiで作成したものなので、品質は保証できません。
 
