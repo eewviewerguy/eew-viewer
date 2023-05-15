@@ -295,10 +295,13 @@ async function getEarthquakeInformation() {
     earthquakeList.innerHTML = `<p>データの取得に失敗しました。</p>`;
   }
 }
-             main();
-             getEarthquakeInformation();
-             setInterval(main, 2000);
-             setInterval(getEarthquakeInformation, 5000);
+function callMain() {
+    main();
+    setTimeout(callMain, 2000);
+}
+
+setTimeout(callMain, 2000);
+
       </script>
    </body>
 </html>
