@@ -295,12 +295,22 @@ async function getEarthquakeInformation() {
     earthquakeList.innerHTML = `<p>データの取得に失敗しました。</p>`;
   }
 }
+
+main();
+getEarthquakeInformation();
+
 function callMain() {
     main();
     setTimeout(callMain, 2000);
 }
 
 setTimeout(callMain, 2000);
+function callEarthquakeInformation() {
+    getEarthquakeInformation();
+    setTimeout(callEarthquakeInformation, 5000);
+}
+
+setTimeout(callEarthquakeInformation 5000);
 
       </script>
    </body>
