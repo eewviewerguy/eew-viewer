@@ -54,7 +54,10 @@ let transformedData;
 
 async function getData(apiEndpoint) {
     try {
-        const response = await fetch(apiEndpoint);
+        const response = await fetch(apiEndpoint, {
+            cache: 'no-store'
+        });
+
         const data = await response.json();
         return data;
     } catch (error) {
@@ -140,7 +143,7 @@ async function main() {
 
     const earthquakeInfo = document.getElementById('earthquake-info');
     if (transformedData) {
-        if (transformedData.iscancel || transformedData.iscancel) {
+        if (transformedData.iscancel) {
             earthquakeInfo.innerHTML = `<p>緊急地震速報は取り消されました。</p>`;
             earthquakeInfo.classList.remove('warn');
         } else if (transformedData.istrainning || Date.now() - new Date(transformedData.report_time).getTime() > 300000) {
