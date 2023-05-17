@@ -198,7 +198,7 @@ async function main() {
                 if (warning.origin_time) {
                     info += ` <p>${warning.origin_time} 発生</p> `;
                 }
-                if (warning.Accuracy) {
+                if (warning.Accuracy_epicenter) {
                     info += `<p>精度情報 震源: ${warning.Accuracy_epicenter}, 深さ: ${warning.Accuracy_depth}, マグニチュード: ${warning.Accuracy_magnitude.replace('（最大5 点）', '')}</p>`;
                 }
             } else {
