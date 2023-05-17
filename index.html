@@ -28,6 +28,9 @@
            animation: blink 1s linear;
          }
 
+.large {
+    font-size: 18px;
+}
          @keyframes blink {
            0% {
              background-color: #F0f0f0;
@@ -167,7 +170,7 @@ async function main() {
     } else {
         for (let i = 0; i < warnings.length; i++) {
             const warning = warnings[i];
-            info += `<p>#${i + 1}</p>`;
+            info += `<p class="large">#${i + 1}</p>`;
             console.log(warning)
             if (warning.iscancel) {
                 info += `<p>緊急地震速報は取り消されました。</p>`;
@@ -323,10 +326,10 @@ getEarthquakeInformation();
 
 function callMain() {
     main();
-    setTimeout(callMain, 2000);
+    setTimeout(callMain, 2500);
 }
 
-setTimeout(callMain, 2000);
+setTimeout(callMain, 2500);
 function callEarthquakeInformation() {
     getEarthquakeInformation();
     setTimeout(callEarthquakeInformation, 5000);
