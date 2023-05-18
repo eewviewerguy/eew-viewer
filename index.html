@@ -178,23 +178,27 @@ async function main() {
             info += ` <p>${warning.iswarn ? '緊急地震速報(警報)' : '緊急地震速報(予報)'}</p> <p>震源地: ${warning.hypocenter}</p> <p>${warning.isfinal ? ((warning.reportnum) ? `最終第${(warning.reportnum)}報` : '最終報') : ((warning.reportnum) ? `第${(warning.reportnum)}報` : '未定義')}</p> <p>予想最大震度: ${warning.maxintensity}</p> `;
 
             const userLocation = getUserLocationFromCookie();
-            if (userLocation) {
-                if (warning.maxintensity) {
-                    const maxIntensity = warning.maxintensity;
-                    if ((warning.isIedred && warning.iswarn) || (!warning.isIedred && maxIntensity >= 4)) {
-                        const userLocationData = warning.forecast.find(area => area.chiiki === userLocation);
-                        if (userLocationData) {
-                            info += `<p>現在地(${userLocation})の予想震度: ${userLocationData.shindomax}</p>`;
-                        } else {
-                            info += `<p>現在地(${userLocation})の予想震度: 不明</p>`;
-                        }
-                    } else {
-                        info += `<p>現在地(${userLocation})の予想震度: 不明</p>`;
-                    }
-                } else {
-                    info += `<p>現在地(${userLocation})の予想震度: 不明</p>`;
-                }
+if (userLocation) {
+    if (warning.maxintensity) {
+        const maxIntensity = warning.maxintensity;
+        if ((warning.isIedred && warning.iswarn) || (!warning.isIedred && maxIntensity >= 4)) {
+            const userLocationData = warning.forecast.find(area => area.chiiki === userLocation);
+            if (userLocationData) {
+                info += `<p>現在地(${userLocation})の予想震度: ${userLocationData.shindomax}</p>`;
+                warning.expectedIntensity = userLocationData.shindomax;
+            } else {
+                info += `<p>現在地(${userLocation})の予想震度: 不明</p>`;
+                warning.expectedIntensity = '不明';
             }
+        } else {
+            info += `<p>現在地(${userLocation})の予想震度: 不明</p>`;
+            warning.expectedIntensity = '不明';
+        }
+    } else {
+        info += `<p>現在地(${userLocation})の予想震度: 不明</p>`;
+        warning.expectedIntensity = '不明';
+    }
+}
 
             if (!warning.isplumepicenter) {
                 info += ` <p>マグニチュード: ${warning.magnitude}</p> <p>深さ: ${(warning.depth ? (warning.depth + 'km') : warning.depth)}</p> `;
