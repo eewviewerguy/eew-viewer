@@ -327,8 +327,8 @@ function saveSettings() {
     saveSettingsButton.addEventListener('click', saveSettings);
     
 function restoreSettings() {
-    useApiEndpoint1 = localStorage.getItem('useApiEndpoint1') === 'true';
-    useApiEndpoint2 = localStorage.getItem('useApiEndpoint2') === 'true';
+    useApiEndpoint1 = localStorage.getItem('useApiEndpoint1') === 'true' || true;
+    useApiEndpoint2 = localStorage.getItem('useApiEndpoint2') === 'true' || true;
     const checkbox1 = document.getElementById('checkbox1');
     const checkbox2 = document.getElementById('checkbox2');
     checkbox1.checked = useApiEndpoint1;
@@ -411,7 +411,7 @@ async function getEarthquakeInformation() {
 
 main();
 getEarthquakeInformation();
-restoreSettings();
+window.addEventListener('load', restoreSettings);
 
 function callMain() {
     main();
