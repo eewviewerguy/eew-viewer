@@ -6,51 +6,84 @@
       <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
       <meta http-equiv="Pragma" content="no-cache">
       <meta http-equiv="Expires" content="0">
-      <style>
-         body {
-         font-family: sans-serif;
-         }
-         h1, h2 {
-         margin: 0;
-         padding: 10px;
-         background-color: #f0f0f0;
-         }
-         #earthquake-info, #earthquake-list {
-         padding: 10px;
-         }
-         @media (max-width: 600px) {
-         body {
-         font-size: 14px;
-         }
-         }
-         .warn {
-           background-color: #ff6964;
-           animation: blink 1s linear;
-         }
-
-.large {
-    font-size: 18px;
+    <style>
+        body {
+            font-family: sans-serif;
+            font-size: 18px;
+        }
+        .warn {
+            background-color: red;
+        }
+        #EEW, #EARTHQUAKEINFO, #Settings {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            margin-top: 0;
+            font-size: 24px;
+        }
+        .large {
+            font-size: 18px;
+        }
+        .warning-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+        }
+        #earthquake-info, #earthquake-list {
+            margin-bottom: 20px;
+        }
+        #save-button {
+            display: block;
+            margin-top: 10px;
+        }
+        
+        button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }
-         @keyframes blink {
-           0% {
-             background-color: #F0f0f0;
-           }
-           100% {
-             background-color: #ff6964;
-           }
-         }
-      </style>
-   </head>
-   <body>
-      <h1>緊急地震速報</h1>
-      <div id="earthquake-info"></div>
-      <h2>地震情報</h2>
-      <div id="earthquake-list"></div>
-      <h2>現在地</h2>
-      <label for="user-location">現在地:</label>
-      <input type="text" id="user-location">
-      <button id="save-button">保存</button><p id="location"></p>
 
+button:hover {
+    background-color: #3e8e41;
+}
+input[type=text] {
+    width: 35%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+}
+
+input[type=text]:focus {
+    border: 2px solid #4CAF50;
+}
+
+
+    </style>
+</head>
+<body>
+    <div id="EEW">
+        <h1>緊急地震速報</h1>
+        <div id="earthquake-info"></div>
+    </div>
+    <div id="EARTHQUAKEINFO">
+        <h2>地震情報</h2>
+        <div id="earthquake-list"></div>
+    </div>
+    <div id="Settings">
+        <h2>現在地</h2>
+        <label for="user-location">現在地:</label>
+        <input type="text" id="user-location">
+        <button id="save-button">保存</button><p id="location"></p>
+    </div>
       <script>
 const earthquakeWarnings = {};
 
@@ -163,15 +196,16 @@ async function main() {
         }
     }
 
-    const earthquakeInfo = document.getElementById('earthquake-info');
-    let info = '';
-    const warnings = Object.values(earthquakeWarnings).sort((a, b) => new Date(b.report_time) - new Date(a.report_time));
-    if (warnings.length === 0) {
-        info += `<p>緊急地震速報は発表されていません。</p>`;
-    } else {
-        for (let i = 0; i < warnings.length; i++) {
-            const warning = warnings[i];
-            info += `<p class="large">#${i + 1}</p>`;
+const earthquakeInfo = document.getElementById('earthquake-info');
+let info = '';
+const warnings = Object.values(earthquakeWarnings).sort((a, b) => new Date(b.report_time) - new Date(a.report_time));
+if (warnings.length === 0) {
+    info += `<p>緊急地震速報は発表されていません。</p>`;
+} else {
+    for (let i = 0; i < warnings.length; i++) {
+        const warning = warnings[i];
+        info += `<div class="warning-box" id="EEW[${warning.EventID}]">`;
+        info += `<p class="large">#${i + 1}</p>`;
             console.log(warning)
             if (warning.iscancel) {
                 info += `<p>緊急地震速報は取り消されました。</p>`;
