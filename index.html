@@ -216,7 +216,9 @@ if (warnings.length === 0) {
     for (let i = 0; i < warnings.length; i++) {
         const warning = warnings[i];
         info += `<div class="warning-box" id="EEW[${warning.EventID}]">`;
-        info += `<p class="large">#${i + 1}</p>`;
+        if (warnings.length > 1) {
+            info += `<p class="large">(${i + 1}/${warnings.length})</p>`;
+        }
             console.log(warning)
             if (warning.iscancel) {
                 info += `<p>緊急地震速報は取り消されました。</p>`;
