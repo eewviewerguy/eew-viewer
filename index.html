@@ -96,10 +96,15 @@ input[type=text]:focus {
         <button id="save-button">保存</button><p id="location"></p>
     </div>
       <script>
+let checkpermission = true;
 let lastReportNum = null;
 let lastReportTime = null;
 const earthquakeWarnings = {};
-
+function notification() {
+if (Notification.permission !== 'granted' && checkpermission) {
+    Notification.requestPermission();
+}
+}
 async function getData(apiEndpoint) {
     try {
         const response = await fetch(apiEndpoint, {
@@ -414,6 +419,7 @@ async function getEarthquakeInformation() {
   }
 }
 main();
+notification()
 getEarthquakeInformation();
 
 function callMain() {
