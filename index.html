@@ -297,10 +297,11 @@ function sendNotification(warning) {
     console.log(warning)
     if (Notification.permission === 'granted') {
         const currentTime = new Date();
+        const userLocation = getUserLocationFromCookie();
         const reportTime = new Date(warning.report_time);
         if (
             (!lastReportTime || currentTime - reportTime < 5 * 60 * 1000) &&
-            (!lastReportNum || warning.reportnum !== lastReportNum || iscancel)
+            (!lastReportNum || warning.reportnum !== lastReportNum || warning.iscancel)
         ) {
             let notificationTitle = '';
             if (warning.iscancel) {
@@ -308,7 +309,10 @@ function sendNotification(warning) {
             } else {
                 const originTime = new Date(warning.origin_time);
                 const timeString = `${originTime.getHours()}時${originTime.getMinutes()}分${originTime.getSeconds()}秒頃`;
-                notificationTitle = `${warning.Title}\n${timeString} ${warning.hypocenter}で地震、\n予想最大震度は${warning.maxintensity}、 現在地の予想震度は${warning.expectedIntensity}`;
+                notificationTitle = `${warning.Title}\n${timeString} ${warning.hypocenter}で地震、\n予想最大震度は${warning.maxintensity}`;
+                if (userLocation) {
+                    notificationTitle  += `、現在地の予想震度は${warning.expectedIntensity}`;
+                }
                 if (warning.isplumepicenter) {
                     notificationTitle += '、\n仮定震源要素のため、Mおよび、深さ不明と推定されます。';
                 } else {
