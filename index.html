@@ -96,6 +96,8 @@ input[type=text]:focus {
         <button id="save-button">保存</button><p id="location"></p>
     </div>
       <script>
+let lastReportNum = null;
+let lastReportTime = null;
 const earthquakeWarnings = {};
 
 async function getData(apiEndpoint) {
@@ -222,6 +224,7 @@ if (warnings.length === 0) {
             console.log(warning)
             if (warning.iscancel) {
                 info += `<p>緊急地震速報は取り消されました。</p>`;
+                sendNotification(warning)
             } else {
             info += ` <p>${warning.iswarn ? '緊急地震速報(警報)' : '緊急地震速報(予報)'}</p> <p>震源地: ${warning.hypocenter}</p> <p>${warning.isfinal ? ((warning.reportnum) ? `最終第${(warning.reportnum)}報` : '最終報') : ((warning.reportnum) ? `第${(warning.reportnum)}報` : '未定義')}</p> <p>予想最大震度: ${warning.maxintensity}</p> `;
 
@@ -257,7 +260,7 @@ if (userLocation) {
                     info += `<p>精度情報 震源: ${warning.Accuracy_epicenter}, 深さ: ${warning.Accuracy_depth}, マグニチュード: ${warning.Accuracy_magnitude.replace('（最大5 点）', '')}</p>`;
                 }
             } else {
-                info += ` <p>${warning.OriginTime}頃検知</p> <p>仮定震源要素のため、震源の深さおよびM不明</p> `;
+                info += ` <p>${warning.origin_time}頃検知</p> <p>仮定震源要素のため、震源の深さおよびM不明</p> `;
             }
             if (warning.forecast && warning.forecast.length > 0) {
                 info += `<p>地域ごとの予想震度(気象庁発表)</p><p>`;
@@ -272,6 +275,7 @@ if (userLocation) {
             } else {
                 info += `<p>地域ごとの予想震度(気象庁発表): 未発表</p>`;
             }
+            sendNotification(warning)
             }
         }
     }
@@ -281,6 +285,35 @@ if (userLocation) {
         document.body.classList.add('warn');
     } else {
         document.body.classList.remove('warn');
+    }
+}
+
+function sendNotification(warning) {
+    console.log(warning)
+    if (Notification.permission === 'granted') {
+        const currentTime = new Date();
+        const reportTime = new Date(warning.report_time);
+        if (
+            (!lastReportTime || currentTime - reportTime < 5 * 60 * 1000) &&
+            (!lastReportNum || warning.reportnum !== lastReportNum || iscancel)
+        ) {
+            let notificationTitle = '';
+            if (warning.iscancel) {
+                notificationTitle = '先程の緊急地震速報は取り消されました。';
+            } else {
+                const originTime = new Date(warning.origin_time);
+                const timeString = `${originTime.getHours()}時${originTime.getMinutes()}分${originTime.getSeconds()}秒頃`;
+                notificationTitle = `${timeString}(${warning.hypocenter})で地震、\n予想最大震度は${warning.maxintensity}、 現在地の予想震度は${warning.expectedIntensity}`;
+                if (warning.isplumepicenter) {
+                    notificationTitle += '、\n仮定震源要素のため、Mおよび、深さ不明と推定されます。';
+                } else {
+                    notificationTitle += `、\nマグニチュードは${warning.magnitude}、深さは${warning.depth}kmと推定されます。`;
+                }
+            }
+            new Notification(notificationTitle);
+            lastReportTime = currentTime;
+            lastReportNum = warning.reportnum;
+        }
     }
 }
 
