@@ -94,17 +94,15 @@ input[type=text]:focus {
         <label for="user-location">現在地:</label>
         <input type="text" id="user-location">
         <button id="save-button">保存</button><p id="location"></p>
+        <label>
+  <input type="checkbox" id="notificationCheckbox">
+  通知を許可する
+</label>
     </div>
       <script>
-let checkpermission = true;
 let lastReportNum = null;
 let lastReportTime = null;
 const earthquakeWarnings = {};
-function notification() {
-if (Notification.permission !== 'granted' && checkpermission) {
-    Notification.requestPermission();
-}
-}
 async function getData(apiEndpoint) {
     try {
         const response = await fetch(apiEndpoint, {
@@ -229,7 +227,9 @@ if (warnings.length === 0) {
             console.log(warning)
             if (warning.iscancel) {
                 info += `<p>緊急地震速報は取り消されました。</p>`;
+                    if (notificationCheckbox.checked && Notification.permission === 'granted') {
                 sendNotification(warning)
+                }
             } else {
             info += ` <p>${warning.iswarn ? '緊急地震速報(警報)' : '緊急地震速報(予報)'}</p> <p>震源地: ${warning.hypocenter}</p> <p>${warning.isfinal ? ((warning.reportnum) ? `最終第${(warning.reportnum)}報` : '最終報') : ((warning.reportnum) ? `第${(warning.reportnum)}報` : '未定義')}</p> <p>予想最大震度: ${warning.maxintensity}</p> `;
 
@@ -280,7 +280,9 @@ if (userLocation) {
             } else {
                 info += `<p>地域ごとの予想震度(気象庁発表): 未発表</p>`;
             }
+            if (notificationCheckbox.checked && Notification.permission === 'granted') {
             sendNotification(warning)
+            }
             }
         }
     }
@@ -347,6 +349,25 @@ document.getElementById('save-button').addEventListener('click', () => {
     const date = new Date();
     date.setFullYear(date.getFullYear() + 1);
     document.cookie = `userLocation=${encodeURIComponent(userLocation)}; expires=${date.toUTCString()}; path=/`;
+});
+
+const notificationCheckbox = document.querySelector('#notificationCheckbox');
+
+// チェックボックスの状態をローカルストレージから読み込む
+const notificationPermission = localStorage.getItem('notificationPermission');
+if (notificationPermission === 'true') {
+    notificationCheckbox.checked = true;
+} else {
+    notificationCheckbox.checked = false;
+}
+
+// チェックボックスがチェックされたときに、ローカルストレージに保存する
+notificationCheckbox.addEventListener('change', () => {
+    localStorage.setItem('notificationPermission', notificationCheckbox.checked);
+    // チェックボックスがチェックされたときに、通知の許可を求める
+    if (notificationCheckbox.checked && Notification.permission !== 'granted') {
+        Notification.requestPermission();
+    }
 });
 
 async function getEarthquakeInformation() {
@@ -423,7 +444,6 @@ async function getEarthquakeInformation() {
   }
 }
 main();
-notification()
 getEarthquakeInformation();
 
 function callMain() {
