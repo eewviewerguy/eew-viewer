@@ -314,7 +314,7 @@ function sendNotification(warning) {
                 if (warning.isfinal) {
                     notificationTitle = `${warning.Title} 最終第${warning.reportnum}報 \n${timeString} ${warning.hypocenter}で地震、\n予想最大震度は${warning.maxintensity}`;
                 } else {
-                    notificationTitle = `${warning.Title} 第${reportnum}報 \n${timeString} ${warning.hypocenter}で地震、\n予想最大震度は${warning.maxintensity}`;
+                    notificationTitle = `${warning.Title} 第${warning.reportnum}報 \n${timeString} ${warning.hypocenter}で地震、\n予想最大震度は${warning.maxintensity}`;
                 }
                 if (userLocation) {
                     notificationTitle  += `、現在地の予想震度は${warning.expectedIntensity}`;
