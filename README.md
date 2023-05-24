@@ -1,6 +1,6 @@
 -EEW VIEWERは、java scriptを使用したウェブサイトです。このサイトは、api.wolfx.jpとiedred apiとnTool Earthquake APIというAPIを情報源に、緊急地震速報、地震情報を表示しています。データは2秒周期(地震情報は5秒)で取得されます。
 
--EEW VIEWERの特徴は、そのシンプルさです。スマートフォンでもPCでも、ブラウザが動作すれば、どのようなデバイスでも動作します。
+-EEW VIEWERの特徴は、そのシンプルさです。スマートフォンでもPCでも、ブラウザが動作すれば、どのようなデバイスでも動作します。ですが、qwpassとかの方が全てにおいて優れているので、そっちを使ったほうがいいと思います！！！！！！！！！
 
 -情報源: 緊急地震速報 - wolfx api -iedred api 地震情報 - nTool Earthquake API
 
