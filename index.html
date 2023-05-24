@@ -311,7 +311,11 @@ function sendNotification(warning) {
             } else {
                 const originTime = new Date(warning.origin_time);
                 const timeString = `${originTime.getHours()}時${originTime.getMinutes()}分${originTime.getSeconds()}秒頃`;
-                notificationTitle = `${warning.Title}\n${timeString} ${warning.hypocenter}で地震、\n予想最大震度は${warning.maxintensity}`;
+                if (warning.isfinal) {
+                    notificationTitle = `${warning.Title} 最終第${warning.reportnum}報 \n${timeString} ${warning.hypocenter}で地震、\n予想最大震度は${warning.maxintensity}`;
+                } else {
+                    notificationTitle = `${warning.Title} 第${reportnum}報 \n${timeString} ${warning.hypocenter}で地震、\n予想最大震度は${warning.maxintensity}`;
+                }
                 if (userLocation) {
                     notificationTitle  += `、現在地の予想震度は${warning.expectedIntensity}`;
                 }
