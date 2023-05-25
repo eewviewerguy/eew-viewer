@@ -119,7 +119,6 @@ async function getData(apiEndpoint) {
 async function main() {
     const apiEndpoint1 = 'https://api.iedred7584.com/eew/json/';
     const apiEndpoint2 = 'https://api.wolfx.jp/jma_eew.json';
-
     const data1 = await getData(apiEndpoint1);
     const data2 = await getData(apiEndpoint2);
 
@@ -318,9 +317,9 @@ function sendNotification(warning) {
                 const originTime = new Date(warning.origin_time);
                 const timeString = `${originTime.getHours()}時${originTime.getMinutes()}分${originTime.getSeconds()}秒頃`;
                 if (warning.isfinal) {
-                    notificationTitle = `${warning.Title} 最終第${warning.reportnum}報 \n${timeString} ${warning.hypocenter}で地震、\n予想最大震度は${warning.maxintensity}`;
+                    notificationTitle = `${warning.Title} 最終第${warning.reportnum}報 \n${timeString} ${warning.hypocenter}で地震、\n予想最大震度は${warning.maxintensity === "不明" ? "未発表または0未満" : warning.maxintensity}`;
                 } else {
-                    notificationTitle = `${warning.Title} 第${warning.reportnum}報 \n${timeString} ${warning.hypocenter}で地震、\n予想最大震度は${warning.maxintensity}`;
+                    notificationTitle = `${warning.Title} 第${warning.reportnum}報 \n${timeString} ${warning.hypocenter}で地震、\n予想最大震度は${warning.maxintensity === "不明" ? "未発または0未満表" : warning.maxintensity}`;
                 }
                 if (userLocation) {
                     notificationTitle  += `、現在地の予想震度は${warning.expectedIntensity}`;
@@ -337,6 +336,8 @@ function sendNotification(warning) {
         }
     }
 }
+
+
 
 function getUserLocationFromCookie() {
     const cookieValue = document.cookie
