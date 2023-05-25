@@ -132,6 +132,8 @@ async function main() {
     }
 
     if (latestData.isIedred) {
+        const rkIndex = latestData.OriginalText.indexOf('RK');
+        const rk = latestData.OriginalText.slice(rkIndex + 2, rkIndex + 5);
         transformedData = {
             isIedred: true,
             EventID: latestData.EventID,
@@ -150,9 +152,9 @@ async function main() {
             maxintensity: latestData.MaxIntensity.String,
             latitude: latestData.Hypocenter.Location.Lat,
             longitude: latestData.Hypocenter.Location.Long,
-            Accuracy_epicenter: latestData.Hypocenter.Accuracy.Epicenter.String,
-            Accuracy_depth: latestData.Hypocenter.Accuracy.Depth.String,
-            Accuracy_magnitude: latestData.Hypocenter.Accuracy.Magnitude.String,
+            Accuracy_epicenter: rk[0],
+            Accuracy_depth: rk[1],
+            Accuracy_magnitude: rk[2],
             forecast: (latestData.Forecast || []).map(item => ({
                 chiiki: item.Intensity.Name,
                 shindomax: item.Intensity.From,
@@ -161,6 +163,8 @@ async function main() {
             }))
         };
     } else {
+        const rkIndex = latestData.OriginalText.indexOf('RK');
+        const rk = latestData.OriginalText.slice(rkIndex + 2, rkIndex + 5);
         transformedData = {
             isIedred: false,
             EventID: latestData.EventID,
@@ -174,9 +178,9 @@ async function main() {
             magnitude: latestData.Magunitude,
             maxintensity: latestData.MaxIntensity,
             depth: latestData.Depth,
-            Accuracy_epicenter: latestData.Accuracy.Epicenter,
-            Accuracy_depth: latestData.Accuracy.Depth,
-            Accuracy_magnitude: latestData.Accuracy.Magnitude,
+            Accuracy_epicenter: rk[0],
+            Accuracy_depth: rk[1],
+            Accuracy_magnitude: rk[2],
             iscancel: latestData.isCancel,
             isplumepicenter: latestData.isAssumption,
             istrainning: latestData.isTraining,
@@ -265,13 +269,44 @@ if (userLocation) {
                 info += ` <p>マグニチュード: ${warning.magnitude}</p> <p>深さ: ${(warning.depth ? (warning.depth + 'km') : warning.depth)}</p> `;
                 if (warning.origin_time) {
                     info += ` <p>${warning.origin_time} 発生</p> `;
-                }
-                if (warning.Accuracy_epicenter) {
-                    info += `<p>精度情報 震源: ${warning.Accuracy_epicenter}, 深さ: ${warning.Accuracy_depth}, マグニチュード: ${warning.Accuracy_magnitude.replace('（最大5 点）', '')}</p>`;
-                }
-            } else {
+                } else {
                 info += ` <p>${warning.origin_time}頃検知</p> <p>仮定震源要素のため、震源の深さおよびM不明</p> `;
             }
+const epicenterAccuracyMap = {
+    1: 'P 波／S 波レベル越え、IPF 法（1 点）、または仮定震源要素',
+    2: 'IPF 法（2 点）',
+    3: 'IPF 法（3 点／4 点）',
+    4: 'IPF 法（5 点以上）',
+    5: '防災科研システム (4点以以下)',
+    6: '防災科研システム（5 点以上）',
+    7: 'EPOS（海域〔観測網外〕）',
+    8: 'EPOS（内陸〔観測網内〕）'
+};
+
+const magnitudeAccuracyMap = {
+    1: '未定義',
+    2: '防災科研システム',
+    3: '全点P相',
+    4: 'P相/全相混在',
+    5: '全点全相',
+    6: 'EPOS',
+    7: '未定義',
+    8: 'P 波／S 波レベル越え、IPF 法（1 点）、または仮定震源要素'
+};
+
+if (warning.Accuracy_epicenter) {
+    const epicenterAccuracy = epicenterAccuracyMap[warning.Accuracy_epicenter] || '不明';
+    const depthAccuracy = epicenterAccuracyMap[warning.Accuracy_depth] || '不明';
+    const magnitudeAccuracy = magnitudeAccuracyMap[warning.Accuracy_magnitude] || '不明';
+    info += `<p>精度情報 震源: ${epicenterAccuracy}, 深さ: ${depthAccuracy}, マグニチュード: ${magnitudeAccuracy}</p>`;
+}
+                }
+        
+        if (warning.isIedred) {
+            info += `API: iedred`;
+        } else {
+            info += `API: wolfx`;
+        }
             if (warning.forecast && warning.forecast.length > 0) {
                 info += `<p>地域ごとの予想震度(気象庁発表)</p><p>`;
                 for (const area of warning.forecast) {
@@ -328,6 +363,11 @@ function sendNotification(warning) {
                     notificationTitle += '、\n仮定震源要素のため、Mおよび、深さ不明と推定されます。';
                 } else {
                     notificationTitle += `、\nマグニチュードは${warning.magnitude}、深さは${warning.depth}kmと推定されます。`;
+                if (warning.isIedred) {
+                    notificationTitle += `、\nAPI: iedred`;
+                } else {
+                    notificationTitle += `、\nAPI: wolfx`;
+                }
                 }
             }
             new Notification(notificationTitle);
