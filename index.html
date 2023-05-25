@@ -98,11 +98,16 @@ input[type=text]:focus {
   <input type="checkbox" id="notificationCheckbox">
   通知を許可する
 </label>
+        <label>
+  <input type="checkbox" id="accuracyCheckbox">
+  確からしさを表示する ※高度な知識が必要です。
+  </label>
     </div>
       <script>
 let lastReportNum = null;
 let lastReportTime = null;
 const earthquakeWarnings = {};
+const startTime = performance.now();
 async function getData(apiEndpoint) {
     try {
         const response = await fetch(apiEndpoint, {
@@ -294,7 +299,7 @@ const magnitudeAccuracyMap = {
     8: 'P 波／S 波レベル越え、IPF 法（1 点）、または仮定震源要素'
 };
 
-if (warning.Accuracy_epicenter) {
+if (accuracyCheckbox.checked && warning.Accuracy_epicenter) {
     const epicenterAccuracy = epicenterAccuracyMap[warning.Accuracy_epicenter] || '不明';
     const depthAccuracy = epicenterAccuracyMap[warning.Accuracy_depth] || '不明';
     const magnitudeAccuracy = magnitudeAccuracyMap[warning.Accuracy_magnitude] || '不明';
@@ -334,6 +339,10 @@ if (warning.Accuracy_epicenter) {
         document.body.classList.remove('warn');
     }
 }
+const endTime = performance.now();
+const elapsedTime = endTime - startTime;
+
+console.log(`mainの実行時間: ${elapsedTime}ミリ秒`);
 
 function sendNotification(warning) {
     console.log(warning)
@@ -377,8 +386,6 @@ function sendNotification(warning) {
     }
 }
 
-
-
 function getUserLocationFromCookie() {
     const cookieValue = document.cookie
         .split('; ')
@@ -411,6 +418,21 @@ if (notificationPermission === 'true') {
 } else {
     notificationCheckbox.checked = false;
 }
+const accuracyCheckbox = document.querySelector('#accuracyCheckbox');
+
+// チェックボックスの状態をローカルストレージから読み込む
+const accuracyPermission = localStorage.getItem('accuracyPermission');
+if (accuracyPermission === 'true') {
+    accuracyCheckbox.checked = true;
+} else {
+    accuracyCheckbox.checked = false;
+}
+
+// チェックボックスがチェックされたときに、ローカルストレージに保存する
+accuracyCheckbox.addEventListener('change', () => {
+    localStorage.setItem('accuracyPermission', accuracyCheckbox.checked);
+});
+
 
 // チェックボックスがチェックされたときに、ローカルストレージに保存する
 notificationCheckbox.addEventListener('change', () => {
