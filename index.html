@@ -231,7 +231,13 @@ if (warnings.length === 0) {
                 sendNotification(warning)
                 }
             } else {
-            info += ` <p>${warning.iswarn ? '緊急地震速報(警報)' : '緊急地震速報(予報)'}</p> <p>震源地: ${warning.hypocenter}</p> <p>${warning.isfinal ? ((warning.reportnum) ? `最終第${(warning.reportnum)}報` : '最終報') : ((warning.reportnum) ? `第${(warning.reportnum)}報` : '未定義')}</p> <p>予想最大震度: ${warning.maxintensity}</p> `;
+            info += ` <p>${warning.iswarn ? '緊急地震速報(警報)' : '緊急地震速報(予報)'}</p> <p>震源地: ${warning.hypocenter}</p> <p>${warning.isfinal ? ((warning.reportnum) ? `最終第${(warning.reportnum)}報` : '最終報') : ((warning.reportnum) ? `第${(warning.reportnum)}報` : '未定義')}</p> <p>`;
+            
+            if (warning.maxintensity === "不明") {
+    info += `<p>予想最大震度: 未発表または0未満</p>`;
+} else {
+    info += `<p>予想最大震度: ${warning.maxintensity}</p>`;
+}
 
             const userLocation = getUserLocationFromCookie();
 if (userLocation) {
