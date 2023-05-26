@@ -121,20 +121,38 @@ async function getData(apiEndpoint) {
     }
 }
 
+window.onload = function() {
+    const earthquakeWarnings = JSON.parse(localStorage.getItem('earthquakeWarnings')) || {};
+    const currentTime = new Date();
+    for (const eventId in earthquakeWarnings) {
+        const warning = earthquakeWarnings[eventId];
+        const reportTime = new Date(warning.report_time);
+        if (warning.iscancel && currentTime - reportTime > 15000) {
+            delete earthquakeWarnings[eventId];
+        } else if (currentTime - reportTime > 300000) {
+            delete earthquakeWarnings[eventId];
+        }
+    }
+    localStorage.setItem('earthquakeWarnings', JSON.stringify(earthquakeWarnings));
+};
+
 async function main() {
     const apiEndpoint1 = 'https://api.iedred7584.com/eew/json/';
     const apiEndpoint2 = 'https://api.wolfx.jp/jma_eew.json';
     const data1 = await getData(apiEndpoint1);
     const data2 = await getData(apiEndpoint2);
+    const earthquakeWarnings = JSON.parse(localStorage.getItem('earthquakeWarnings')) || {};
 
     const currentTime = new Date();
 
-    let latestData;
-    if (new Date(data1.AnnouncedTime.String) <= new Date(data2.AnnouncedTime)) {
-        latestData = {...data2, isIedred: false};
-    } else {
-        latestData = {...data1, isIedred: true};
-    }
+let latestData;
+if (data1.Warn && (new Date(data1.AnnouncedTime.String) > new Date(data2.AnnouncedTime) || new Date(data1.AnnouncedTime.String) === new Date(data2.AnnouncedTime))) {
+    latestData = {...data1, isIedred: true};
+} else if (new Date(data1.AnnouncedTime.String) <= new Date(data2.AnnouncedTime)) {
+    latestData = {...data2, isIedred: false};
+} else {
+    latestData = {...data1, isIedred: true};
+}
 
     if (latestData.isIedred) {
         const rkIndex = latestData.OriginalText.indexOf('RK');
@@ -208,6 +226,7 @@ async function main() {
         } else {
             delete earthquakeWarnings[eventId];
         }
+      localStorage.setItem('earthquakeWarnings', JSON.stringify(earthquakeWarnings));
     }
 
     for (const eventId in earthquakeWarnings) {
