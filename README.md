@@ -21,4 +21,4 @@ EEW VIEWERは、JavaScriptを使用したウェブサイトです。このサイ
 ウイルスやバグを発見した場合はissuesまたはTwitterに連絡していただけると幸いです。
 
 ## 他の優れたソフトウェア
-- 正直言って[qwpass](https://qwpass.svdprev.info/)の方がeew-viewerより明らかに優れています。なのでqwpassをおすすめします。
+正直言って[qwpass](https://qwpass.svdprev.info/)の方がeew-viewerより明らかに優れています。なのでqwpassをおすすめします。
