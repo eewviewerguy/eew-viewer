@@ -404,7 +404,7 @@ function sendNotification(warning) {
                 } else if (warning.isfinal) {
                     notificationTitle = `${warning.Title} 最終第${warning.reportnum}報 \n${timeString} ${warning.hypocenter}で地震、\n予想最大震度は${warning.maxintensity === "不明" ? "未発表または0未満" : warning.maxintensity}`;
                 } else {
-                    notificationTitle = `${warning.Title} 第${warning.reportnum}報 \n${timeString} ${warning.hypocenter}で地震、\n予想最大震度は${warning.maxintensity === "不明" ? "未発または0未満表" : warning.maxintensity}`;
+                    notificationTitle = `${warning.Title} 第${warning.reportnum}報 \n${timeString} ${warning.hypocenter}で地震、\n予想最大震度は${warning.maxintensity === "不明" ? "未発表または0未満表" : warning.maxintensity}`;
                 }
                 
                 if (warning.isLevel) {
