@@ -406,6 +406,11 @@ function sendNotification(warning) {
                 } else {
                     notificationTitle = `${warning.Title} 第${warning.reportnum}報 \n${timeString} ${warning.hypocenter}で地震、\n予想最大震度は${warning.maxintensity === "不明" ? "未発または0未満表" : warning.maxintensity}`;
                 }
+                
+                if (warning.isLevel) {
+                    notificationTitle += `\nレベル法による仮定震源要素のため、\nMおよび、深さ不明と推定されます。`;
+　　　　　　　　}
+
                 if (userLocation) {
                     notificationTitle  += `\n現在地の予想震度は${warning.expectedIntensity}`;
                 }
