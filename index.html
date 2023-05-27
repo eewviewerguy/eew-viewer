@@ -45,6 +45,10 @@
             margin-top: 10px;
         }
         
+        #Settings label {
+    display: block;
+}
+        
         button {
     background-color: #4CAF50;
     color: white;
@@ -102,6 +106,10 @@ input[type=text]:focus {
   <input type="checkbox" id="accuracyCheckbox">
   確からしさを表示する ※高度な知識が必要です。
   </label>
+  <label>
+  <input type="checkbox" id="showAllCheckbox">
+  精度が低い緊急地震速報を表示する
+</label>
     </div>
       <script>
 let lastReportNum = null;
@@ -218,26 +226,28 @@ if (data1.Warn && (new Date(data1.AnnouncedTime.String) > new Date(data2.Announc
         };
     }
 
-    if (transformedData) {
-        const eventId = transformedData.EventID;
-        const reportTime = new Date(transformedData.report_time);
-        if (currentTime - reportTime <= 300000) {
-            earthquakeWarnings[eventId] = transformedData;
-        } else {
-            delete earthquakeWarnings[eventId];
-        }
-      localStorage.setItem('earthquakeWarnings', JSON.stringify(earthquakeWarnings));
+if (transformedData) {
+    const eventId = transformedData.EventID;
+    const reportTime = new Date(transformedData.report_time);
+    if (!showAllEEW && transformedData.Accuracy_epicenter === 1) {
+        delete earthquakeWarnings[eventId];
+    } else if (showAllEEW && currentTime - reportTime <= 300000) {
+        earthquakeWarnings[eventId] = transformedData;
+    } else {
+        delete earthquakeWarnings[eventId];
     }
+    localStorage.setItem('earthquakeWarnings', JSON.stringify(earthquakeWarnings));
+}
 
-    for (const eventId in earthquakeWarnings) {
-        const warning = earthquakeWarnings[eventId];
-        const reportTime = new Date(warning.report_time);
-        if (warning.iscancel && currentTime - reportTime > 15000) {
-            delete earthquakeWarnings[eventId];
-        } else if (currentTime - reportTime > 300000) {
-            delete earthquakeWarnings[eventId];
-        }
+for (const eventId in earthquakeWarnings) {
+    const warning = earthquakeWarnings[eventId];
+    const reportTime = new Date(warning.report_time);
+    if (warning.iscancel && currentTime - reportTime > 15000) {
+        delete earthquakeWarnings[eventId];
+    } else if (currentTime - reportTime > 300000) {
+        delete earthquakeWarnings[eventId];
     }
+}
 
 const earthquakeInfo = document.getElementById('earthquake-info');
 let info = '';
@@ -460,6 +470,14 @@ notificationCheckbox.addEventListener('change', () => {
     if (notificationCheckbox.checked && Notification.permission !== 'granted') {
         Notification.requestPermission();
     }
+});
+
+let showAllEEW = JSON.parse(localStorage.getItem('showAllEEW')) || false;
+const showAllCheckbox = document.getElementById('showAllCheckbox');
+showAllCheckbox.checked = showAllEEW;
+showAllCheckbox.addEventListener('change', () => {
+    showAllEEW = showAllCheckbox.checked;
+    localStorage.setItem('showAllEEW', JSON.stringify(showAllEEW));
 });
 
 async function getEarthquakeInformation() {
