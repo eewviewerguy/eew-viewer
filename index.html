@@ -167,6 +167,7 @@ if (data1.Warn && (new Date(data1.AnnouncedTime.String) > new Date(data2.Announc
         const rk = latestData.OriginalText.slice(rkIndex + 2, rkIndex + 5);
         transformedData = {
             isIedred: true,
+            isLevel: latestData.Title.Code === 35,
             EventID: latestData.EventID,
             Title: latestData.Title.String,
             reportnum: latestData.Serial,
@@ -194,36 +195,38 @@ if (data1.Warn && (new Date(data1.AnnouncedTime.String) > new Date(data2.Announc
             }))
         };
     } else {
-        const rkIndex = latestData.OriginalText.indexOf('RK');
-        const rk = latestData.OriginalText.slice(rkIndex + 2, rkIndex + 5);
-        transformedData = {
-            isIedred: false,
-            EventID: latestData.EventID,
-            Title: latestData.Title,
-            report_time: latestData.AnnouncedTime,
-            origin_time: latestData.OriginTime,
-            hypocenter: latestData.Hypocenter,
-            reportnum: latestData.Serial,
-            latitude: latestData.Latitude,
-            longitude: latestData.Longitude,
-            magnitude: latestData.Magunitude,
-            maxintensity: latestData.MaxIntensity,
-            depth: latestData.Depth,
-            Accuracy_epicenter: rk[0],
-            Accuracy_depth: rk[1],
-            Accuracy_magnitude: rk[2],
-            iscancel: latestData.isCancel,
-            isplumepicenter: latestData.isAssumption,
-            istrainning: latestData.isTraining,
-            iswarn: latestData.isWarn,
-            isfinal: latestData.isFinal,
-            forecast: (latestData.WarnArea || []).map(item => ({
-                chiiki: item.Chiiki,
-                shindomax: item.Shindo1,
-                shindolowest: item.Shindo2,
-                isWarn: item.Type === '警報'
-            }))
-        };
+const rkIndex = latestData.OriginalText.indexOf('RK');
+const rk = latestData.OriginalText.slice(rkIndex + 2, rkIndex + 5);
+transformedData = {
+    isIedred: false,
+    EventID: latestData.EventID,
+    Title: latestData.Title,
+    report_time: latestData.AnnouncedTime,
+    origin_time: latestData.OriginTime,
+    hypocenter: latestData.Hypocenter,
+    reportnum: latestData.Serial,
+    latitude: latestData.Latitude,
+    longitude: latestData.Longitude,
+    magnitude: latestData.Magunitude,
+    maxintensity: latestData.MaxIntensity,
+    depth: latestData.Depth,
+    Accuracy_epicenter: rk[0],
+    Accuracy_depth: rk[1],
+    Accuracy_magnitude: rk[2],
+    iscancel: latestData.isCancel,
+    isplumepicenter: latestData.isAssumption,
+    istrainning: latestData.isTraining,
+    iswarn: latestData.isWarn,
+    isfinal: latestData.isFinal,
+    forecast: (latestData.WarnArea || []).map(item => ({
+        chiiki: item.Chiiki,
+        shindomax: item.Shindo1,
+        shindolowest: item.Shindo2,
+        isWarn: item.Type === '警報'
+    })),
+    isLevel: (latestData.OriginalText.slice(0, 2) === '35')
+};
+console.log(transformedData)
     }
 
 if (transformedData) {
@@ -269,8 +272,9 @@ if (warnings.length === 0) {
                 }
             } else {
             info += ` <p>${warning.iswarn ? '緊急地震速報(警報)' : '緊急地震速報(予報)'}</p> <p>震源地: ${warning.hypocenter}</p> <p>${warning.isfinal ? ((warning.reportnum) ? `最終第${(warning.reportnum)}報` : '最終報') : ((warning.reportnum) ? `第${(warning.reportnum)}報` : '未定義')}</p> <p>`;
-            
-            if (warning.maxintensity === "不明") {
+if (warning.isLevel) {
+    info += `<p>強い揺れ</p>`;        
+} else if (warning.maxintensity === "不明") {
     info += `<p>予想最大震度: 未発表または0未満</p>`;
 } else {
     info += `<p>予想最大震度: ${warning.maxintensity}</p>`;
@@ -299,13 +303,19 @@ if (userLocation) {
     }
 }
 
-            if (!warning.isplumepicenter) {
-                info += ` <p>マグニチュード: ${warning.magnitude}</p> <p>深さ: ${(warning.depth ? (warning.depth + 'km') : warning.depth)}</p> `;
-                if (warning.origin_time) {
-                    info += ` <p>${warning.origin_time} 発生</p> `;
-                } else {
-                info += ` <p>${warning.origin_time}頃検知</p> <p>仮定震源要素のため、震源の深さおよびM不明</p> `;
-            }
+switch (true) {
+    case warning.isLevel:
+        info += `<p>${warning.origin_time}頃検知</p> <p>レベル法による仮定震源要素のため、震源の深さおよびM不明</p>`;
+        break;
+    case !warning.isplumepicenter && !warning.isLevel:
+        info += ` <p>マグニチュード: ${warning.magnitude}</p> <p>深さ: ${(warning.depth ? (warning.depth + 'km') : warning.depth)}</p> `;
+        if (warning.origin_time) {
+            info += ` <p>${warning.origin_time} 発生</p> `;
+        } else {
+            info += ` <p>${warning.origin_time}頃検知</p> <p>仮定震源要素のため、震源の深さおよびM不明</p> `;
+        }
+        break;
+
 const epicenterAccuracyMap = {
     1: 'P 波／S 波レベル越え、IPF 法（1 点）、または仮定震源要素',
     2: 'IPF 法（2 点）',
@@ -389,7 +399,9 @@ function sendNotification(warning) {
             } else {
                 const originTime = new Date(warning.origin_time);
                 const timeString = `${originTime.getHours()}時${originTime.getMinutes()}分${originTime.getSeconds()}秒頃`;
-                if (warning.isfinal) {
+                if (warning.isLevel) {
+                    notificationTitle = `${warning.Title} 第${warning.reportnum}報 \n${timeString} ${warning.hypocenter}付近で強い揺れ。`;
+                } else if (warning.isfinal) {
                     notificationTitle = `${warning.Title} 最終第${warning.reportnum}報 \n${timeString} ${warning.hypocenter}で地震、\n予想最大震度は${warning.maxintensity === "不明" ? "未発表または0未満" : warning.maxintensity}`;
                 } else {
                     notificationTitle = `${warning.Title} 第${warning.reportnum}報 \n${timeString} ${warning.hypocenter}で地震、\n予想最大震度は${warning.maxintensity === "不明" ? "未発または0未満表" : warning.maxintensity}`;
