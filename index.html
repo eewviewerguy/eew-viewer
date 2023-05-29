@@ -116,7 +116,23 @@ let lastReportNum = null;
 let lastReportTime = null;
 const earthquakeWarnings = {};
 const startTime = performance.now();
+let stopped = false;
+let lastAccessTime = 0;
+let accessCount = 0;
+
 async function getData(apiEndpoint) {
+    const currentTime = Date.now();
+    if (currentTime - lastAccessTime < 1000) {
+        accessCount++;
+        if (accessCount >= 3) {
+            stopped = true;
+            return;
+        }
+    } else {
+        lastAccessTime = currentTime;
+        accessCount = 0;
+    }
+
     try {
         const response = await fetch(apiEndpoint, {
             cache: 'no-store'
@@ -128,7 +144,6 @@ async function getData(apiEndpoint) {
         console.error(error);
     }
 }
-
 window.onload = function() {
     const earthquakeWarnings = JSON.parse(localStorage.getItem('earthquakeWarnings')) || {};
     const currentTime = new Date();
@@ -145,6 +160,11 @@ window.onload = function() {
 };
 
 async function main() {
+    const earthquakeInfo = document.getElementById('earthquake-info');
+        if (stopped) {
+    earthquakeInfo.innerHTML = '<p>1秒間に3回以上のリクエストを検知しました。開発者に報告してください。</p>';
+    return;
+}
     const apiEndpoint1 = 'https://api.iedred7584.com/eew/json/';
     const apiEndpoint2 = 'https://api.wolfx.jp/jma_eew.json';
     const data1 = await getData(apiEndpoint1);
@@ -252,7 +272,6 @@ for (const eventId in earthquakeWarnings) {
     }
 }
 
-const earthquakeInfo = document.getElementById('earthquake-info');
 let info = '';
 const warnings = Object.values(earthquakeWarnings).sort((a, b) => new Date(b.report_time) - new Date(a.report_time));
 if (warnings.length === 0) {
@@ -498,12 +517,16 @@ showAllCheckbox.addEventListener('change', () => {
 });
 
 async function getEarthquakeInformation() {
-  try {
-    const response = await fetch('https://dev.narikakun.net/webapi/earthquake/post_data.json', {
-      cache: 'no-store'
-    });
-    const data = await response.json();
-    const earthquakeList = document.getElementById('earthquake-list');
+const earthquakeList = document.getElementById('earthquake-list');
+    if (stopped) {
+       earthquakeList.innerHTML = `<p>1秒間に3回以上のリクエストを検知しました。開発者に報告してください。</p>`
+        return;
+    }
+
+    try {
+        const data = await getData('https://dev.narikakun.net/webapi/earthquake/post_data.json');
+        const earthquakeList = document.getElementById('earthquake-list');
+
     if (data.Head.Title === '震度速報') {
       let intensityObservations = '';
       if (data.Body.Intensity && data.Body.Intensity.Observation && data.Body.Intensity.Observation.Pref) {
