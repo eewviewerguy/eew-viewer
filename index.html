@@ -275,7 +275,7 @@ if (warnings.length === 0) {
 if (warning.isLevel) {
     info += `<p>強い揺れ</p>`;        
 } else if (warning.maxintensity === "不明") {
-    info += `<p>予想最大震度: 未発表または0未満</p>`;
+    info += `<p>予想最大震度: 未発表または1未満</p>`;
 } else {
     info += `<p>予想最大震度: ${warning.maxintensity}</p>`;
 }
@@ -402,9 +402,9 @@ function sendNotification(warning) {
                 if (warning.isLevel) {
                     notificationTitle = `${warning.Title} 第${warning.reportnum}報 \n${timeString} ${warning.hypocenter}付近で強い揺れ。`;
                 } else if (warning.isfinal) {
-                    notificationTitle = `${warning.Title} 最終第${warning.reportnum}報 \n${timeString} ${warning.hypocenter}で地震、\n予想最大震度は${warning.maxintensity === "不明" ? "未発表または0未満" : warning.maxintensity}`;
+                    notificationTitle = `${warning.Title} 最終第${warning.reportnum}報 \n${timeString} ${warning.hypocenter}で地震、\n予想最大震度は${warning.maxintensity === "不明" ? "未発表または1未満" : warning.maxintensity}`;
                 } else {
-                    notificationTitle = `${warning.Title} 第${warning.reportnum}報 \n${timeString} ${warning.hypocenter}で地震、\n予想最大震度は${warning.maxintensity === "不明" ? "未発表または0未満表" : warning.maxintensity}`;
+                    notificationTitle = `${warning.Title} 第${warning.reportnum}報 \n${timeString} ${warning.hypocenter}で地震、\n予想最大震度は${warning.maxintensity === "不明" ? "未発表または1未満" : warning.maxintensity}`;
                 }
                 
                 if (warning.isLevel) {
