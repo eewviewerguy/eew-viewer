@@ -124,7 +124,7 @@ async function getData(apiEndpoint) {
     const currentTime = Date.now();
     if (currentTime - lastAccessTime < 1000) {
         accessCount++;
-        if (accessCount >= 3) {
+        if (accessCount >= 4) {
             stopped = true;
             return;
         }
@@ -162,7 +162,7 @@ window.onload = function() {
 async function main() {
     const earthquakeInfo = document.getElementById('earthquake-info');
         if (stopped) {
-    earthquakeInfo.innerHTML = '<p>1秒間に3回以上のリクエストを検知しました。開発者に報告してください。</p>';
+    earthquakeInfo.innerHTML = '<p>1秒間に4回以上のリクエストを検知しました。開発者に報告してください。</p>';
     return;
 }
     const apiEndpoint1 = 'https://api.iedred7584.com/eew/json/';
@@ -520,7 +520,7 @@ showAllCheckbox.addEventListener('change', () => {
 async function getEarthquakeInformation() {
 const earthquakeList = document.getElementById('earthquake-list');
     if (stopped) {
-       earthquakeList.innerHTML = `<p>1秒間に3回以上のリクエストを検知しました。開発者に報告してください。</p>`
+       earthquakeList.innerHTML = `<p>1秒間に4回以上のリクエストを検知しました。開発者に報告してください。</p>`
         return;
     }
 
