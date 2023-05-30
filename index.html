@@ -172,6 +172,8 @@ async function main() {
     const earthquakeWarnings = JSON.parse(localStorage.getItem('earthquakeWarnings')) || {};
 
     const currentTime = new Date();
+    
+    const msg = 'test'
 
 let latestData;
 if (data1.Warn && (new Date(data1.AnnouncedTime.String) > new Date(data2.AnnouncedTime) || new Date(data1.AnnouncedTime.String) === new Date(data2.AnnouncedTime))) {
@@ -334,7 +336,7 @@ switch (true) {
             info += ` <p>${warning.origin_time}頃検知</p> <p>仮定震源要素のため、震源の深さおよびM不明</p> `;
         }
         break;
-
+    }
 const epicenterAccuracyMap = {
     1: 'P 波／S 波レベル越え、IPF 法（1 点）、または仮定震源要素',
     2: 'IPF 法（2 点）',
@@ -363,8 +365,7 @@ if (accuracyCheckbox.checked && warning.Accuracy_epicenter) {
     const magnitudeAccuracy = magnitudeAccuracyMap[warning.Accuracy_magnitude] || '不明';
     info += `<p>精度情報 震源: ${epicenterAccuracy}, 深さ: ${depthAccuracy}, マグニチュード: ${magnitudeAccuracy}</p>`;
 }
-                }
-        
+      
         if (warning.isIedred) {
             info += `API: iedred`;
         } else {
