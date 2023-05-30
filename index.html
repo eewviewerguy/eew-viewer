@@ -477,7 +477,6 @@ document.getElementById('save-button').addEventListener('click', () => {
 
 const notificationCheckbox = document.querySelector('#notificationCheckbox');
 
-// チェックボックスの状態をローカルストレージから読み込む
 const notificationPermission = localStorage.getItem('notificationPermission');
 if (notificationPermission === 'true') {
     notificationCheckbox.checked = true;
@@ -486,7 +485,6 @@ if (notificationPermission === 'true') {
 }
 const accuracyCheckbox = document.querySelector('#accuracyCheckbox');
 
-// チェックボックスの状態をローカルストレージから読み込む
 const accuracyPermission = localStorage.getItem('accuracyPermission');
 if (accuracyPermission === 'true') {
     accuracyCheckbox.checked = true;
@@ -494,16 +492,13 @@ if (accuracyPermission === 'true') {
     accuracyCheckbox.checked = false;
 }
 
-// チェックボックスがチェックされたときに、ローカルストレージに保存する
 accuracyCheckbox.addEventListener('change', () => {
     localStorage.setItem('accuracyPermission', accuracyCheckbox.checked);
 });
 
 
-// チェックボックスがチェックされたときに、ローカルストレージに保存する
 notificationCheckbox.addEventListener('change', () => {
     localStorage.setItem('notificationPermission', notificationCheckbox.checked);
-    // チェックボックスがチェックされたときに、通知の許可を求める
     if (notificationCheckbox.checked && Notification.permission !== 'granted') {
         Notification.requestPermission();
     }
@@ -609,6 +604,7 @@ function callEarthquakeInformation() {
 }
 
 setTimeout(callEarthquakeInformation, 5000);
+//made by microsoft bing ai and eewviewerguy
       </script>
    </body>
 </html>
