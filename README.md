@@ -6,7 +6,7 @@ EEW VIEWERは、JavaScriptを使用したウェブサイトです。このサイ
 - シンプルなデザイン
 - スマートフォンやPCなど、ブラウザが動作するデバイスで利用可能
 ### 情報源
-- 緊急地震速報: wolfx API, iedred API
+- 緊急地震速報: api.wolfx.jp, api.iedred7584.com
 - 地震情報: nTool Earthquake API
 ### 注意事項
 - 一部の情報は高度な緊急地震速報に関する知識が必要です。緊急地震速報の特性や限界を理解した上でご利用ください。
