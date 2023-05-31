@@ -110,29 +110,16 @@ input[type=text]:focus {
   <input type="checkbox" id="showAllCheckbox">
   精度が低い緊急地震速報を表示する
 </label>
+<div id="performance"></div>
     </div>
       <script>
 let lastReportNum = null;
 let lastReportTime = null;
 const earthquakeWarnings = {};
+const currentTime = Date.now();
 const startTime = performance.now();
-let stopped = false;
-let lastAccessTime = 0;
-let accessCount = 0;
 
 async function getData(apiEndpoint) {
-    const currentTime = Date.now();
-    if (currentTime - lastAccessTime < 1000) {
-        accessCount++;
-        if (accessCount >= 4) {
-            stopped = true;
-            return;
-        }
-    } else {
-        lastAccessTime = currentTime;
-        accessCount = 0;
-    }
-
     try {
         const response = await fetch(apiEndpoint, {
             cache: 'no-store'
@@ -160,23 +147,17 @@ window.onload = function() {
 };
 
 async function main() {
-    const earthquakeInfo = document.getElementById('earthquake-info');
-        if (stopped) {
-    earthquakeInfo.innerHTML = '<p>1秒間に4回以上のリクエストを検知しました。開発者に報告してください。</p>';
-    return;
-}
     const apiEndpoint1 = 'https://api.iedred7584.com/eew/json/';
     const apiEndpoint2 = 'https://api.wolfx.jp/jma_eew.json';
     const data1 = await getData(apiEndpoint1);
     const data2 = await getData(apiEndpoint2);
     const earthquakeWarnings = JSON.parse(localStorage.getItem('earthquakeWarnings')) || {};
 
-    const currentTime = new Date();
-    
-    const msg = 'test'
+const performanceElement = document.getElementById('performance');
+const startTime = performance.now();
 
 let latestData;
-if (data1.Warn && (new Date(data1.AnnouncedTime.String) > new Date(data2.AnnouncedTime) || new Date(data1.AnnouncedTime.String) === new Date(data2.AnnouncedTime))) {
+if (data1.Warn && new Date(data1.AnnouncedTime.String) >= new Date(data2.AnnouncedTime)) {
     latestData = {...data1, isIedred: true};
 } else if (new Date(data1.AnnouncedTime.String) <= new Date(data2.AnnouncedTime)) {
     latestData = {...data2, isIedred: false};
@@ -189,7 +170,6 @@ if (data1.Warn && (new Date(data1.AnnouncedTime.String) > new Date(data2.Announc
         const rk = latestData.OriginalText.slice(rkIndex + 2, rkIndex + 5);
         transformedData = {
             isIedred: true,
-            isLevel: latestData.Title.Code === 35,
             EventID: latestData.EventID,
             Title: latestData.Title.String,
             reportnum: latestData.Serial,
@@ -209,6 +189,7 @@ if (data1.Warn && (new Date(data1.AnnouncedTime.String) > new Date(data2.Announc
             Accuracy_epicenter: rk[0],
             Accuracy_depth: rk[1],
             Accuracy_magnitude: rk[2],
+            isLevel: latestData.Title.Code === "35" && parseInt(latestData.Maxintensity.String) === 5,
             forecast: (latestData.Forecast || []).map(item => ({
                 chiiki: item.Intensity.Name,
                 shindomax: item.Intensity.From,
@@ -239,6 +220,7 @@ transformedData = {
     isplumepicenter: latestData.isAssumption,
     istrainning: latestData.isTraining,
     iswarn: latestData.isWarn,
+    isLevel: (latestData.OriginalText.slice(0, 2) === '35' && parseInt(latestData.MaxIntensity) === 5 && !latestData.isWarn),
     isfinal: latestData.isFinal,
     forecast: (latestData.WarnArea || []).map(item => ({
         chiiki: item.Chiiki,
@@ -246,12 +228,13 @@ transformedData = {
         shindolowest: item.Shindo2,
         isWarn: item.Type === '警報'
     })),
-    isLevel: (latestData.OriginalText.slice(0, 2) === '35')
 };
-console.log(transformedData)
     }
 
+
+
 if (transformedData) {
+    console.log(transformedData)
     const eventId = transformedData.EventID;
     const reportTime = new Date(transformedData.report_time);
     if (!showAllEEW && transformedData.Accuracy_epicenter === 1) {
@@ -274,6 +257,7 @@ for (const eventId in earthquakeWarnings) {
     }
 }
 
+const earthquakeInfo = document.getElementById('earthquake-info');
 let info = '';
 const warnings = Object.values(earthquakeWarnings).sort((a, b) => new Date(b.report_time) - new Date(a.report_time));
 if (warnings.length === 0) {
@@ -397,6 +381,11 @@ if (accuracyCheckbox.checked && warning.Accuracy_epicenter) {
     } else {
         document.body.classList.remove('warn');
     }
+
+const endTime = performance.now();
+const elapsedTime = endTime - startTime;
+
+performanceElement.innerHTML = `処理にかかった時間: ${elapsedTime.toFixed(2)}ミリ秒`;
 }
 const endTime = performance.now();
 const elapsedTime = endTime - startTime;
@@ -477,6 +466,7 @@ document.getElementById('save-button').addEventListener('click', () => {
 
 const notificationCheckbox = document.querySelector('#notificationCheckbox');
 
+// チェックボックスの状態をローカルストレージから読み込む
 const notificationPermission = localStorage.getItem('notificationPermission');
 if (notificationPermission === 'true') {
     notificationCheckbox.checked = true;
@@ -485,6 +475,7 @@ if (notificationPermission === 'true') {
 }
 const accuracyCheckbox = document.querySelector('#accuracyCheckbox');
 
+// チェックボックスの状態をローカルストレージから読み込む
 const accuracyPermission = localStorage.getItem('accuracyPermission');
 if (accuracyPermission === 'true') {
     accuracyCheckbox.checked = true;
@@ -492,13 +483,16 @@ if (accuracyPermission === 'true') {
     accuracyCheckbox.checked = false;
 }
 
+// チェックボックスがチェックされたときに、ローカルストレージに保存する
 accuracyCheckbox.addEventListener('change', () => {
     localStorage.setItem('accuracyPermission', accuracyCheckbox.checked);
 });
 
 
+// チェックボックスがチェックされたときに、ローカルストレージに保存する
 notificationCheckbox.addEventListener('change', () => {
     localStorage.setItem('notificationPermission', notificationCheckbox.checked);
+    // チェックボックスがチェックされたときに、通知の許可を求める
     if (notificationCheckbox.checked && Notification.permission !== 'granted') {
         Notification.requestPermission();
     }
@@ -513,12 +507,6 @@ showAllCheckbox.addEventListener('change', () => {
 });
 
 async function getEarthquakeInformation() {
-const earthquakeList = document.getElementById('earthquake-list');
-    if (stopped) {
-       earthquakeList.innerHTML = `<p>1秒間に4回以上のリクエストを検知しました。開発者に報告してください。</p>`
-        return;
-    }
-
     try {
         const data = await getData('https://dev.narikakun.net/webapi/earthquake/post_data.json');
         const earthquakeList = document.getElementById('earthquake-list');
@@ -604,7 +592,6 @@ function callEarthquakeInformation() {
 }
 
 setTimeout(callEarthquakeInformation, 5000);
-//made by microsoft bing ai and eewviewerguy
       </script>
    </body>
 </html>
