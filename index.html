@@ -113,7 +113,7 @@ input[type=text]:focus {
 <div id="performance"></div>
     </div>
       <script>
-let lastReportNum = null;
+let lastReportNums = {};
 let lastReportTime = null;
 const earthquakeWarnings = {};
 const currentTime = Date.now();
@@ -397,10 +397,10 @@ function sendNotification(warning) {
     if (Notification.permission === 'granted') {
         const currentTime = new Date();
         const userLocation = getUserLocationFromCookie();
-        const reportTime = new Date(warning.report_time);
+        const reportTime = new Date(warning.report_time);        
         if (
             (!lastReportTime || currentTime - reportTime < 5 * 60 * 1000) &&
-            (!lastReportNum || warning.reportnum !== lastReportNum || warning.iscancel)
+            (!lastReportNums[warning.EventID] || warning.reportnum !== lastReportNums[warning.EventID] || warning.iscancel)
         ) {
             let notificationTitle = '';
             if (warning.iscancel) {
@@ -436,7 +436,7 @@ function sendNotification(warning) {
             }
             new Notification(notificationTitle);
             lastReportTime = currentTime;
-            lastReportNum = warning.reportnum;
+            lastReportNums[warning.EventID] = warning.reportnum;
         }
     }
 }
