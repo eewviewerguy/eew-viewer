@@ -151,6 +151,7 @@ async function main() {
     const apiEndpoint2 = 'https://api.wolfx.jp/jma_eew.json';
     const data1 = await getData(apiEndpoint1);
     const data2 = await getData(apiEndpoint2);
+    const currentTime = Date.now();
     const earthquakeWarnings = JSON.parse(localStorage.getItem('earthquakeWarnings')) || {};
 
 const performanceElement = document.getElementById('performance');
@@ -234,7 +235,6 @@ transformedData = {
 
 
 if (transformedData) {
-    console.log(transformedData)
     const eventId = transformedData.EventID;
     const reportTime = new Date(transformedData.report_time);
     if (!showAllEEW && transformedData.Accuracy_epicenter === 1) {
