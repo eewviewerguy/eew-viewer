@@ -6,114 +6,134 @@
       <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
       <meta http-equiv="Pragma" content="no-cache">
       <meta http-equiv="Expires" content="0">
-    <style>
-        body {
-            font-family: sans-serif;
-            font-size: 18px;
-        }
-         .warn {
-           background-color: #ff6964;
-           animation: blink 1s linear;
-         }
-        #EEW, #EARTHQUAKEINFO, #Settings {
-            backdrop-filter: blur(5px);
-            background-color: white;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            margin-top: 0;
-            font-size: 24px;
-        }
-        .large {
-            font-size: 18px;
-        }
-        .warning-box {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-        }
-
-        #earthquake-info, #earthquake-list {
-            margin-bottom: 20px;
-        }
-        #save-button {
-            display: block;
-            margin-top: 10px;
-        }
-        
-        #Settings label {
+<style>
+  body {
+    font-family: sans-serif;
+    font-size: 18px;
+  }
+  .warn {
+    background-color: #ff6964;
+    animation: blink 1s linear;
+  }
+  #EEW, #EARTHQUAKEINFO, #Settings, #FORECAST {
+    justify-content: center;
+    backdrop-filter: blur(5px);
+    background-color: white;
+    max-width: 800px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  h1 {
+    margin-top: 0;
+    font-size: 24px;
+  }
+  .large {
+    font-size: 18px;
+  }
+  .warning-box {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+  }
+  #earthquake-info, #earthquake-list, #forecast-info {
+    margin-bottom: 20px;
+  }
+  #save-button {
     display: block;
-}
-        
-        button {
+    margin-top: 10px;
+  }
+  #Settings label {
+    display: block;
+  }
+  button {
     background-color: #4CAF50;
     color: white;
     padding: 12px 20px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-}
-
-button:hover {
+  }
+  button:hover {
     background-color: #3e8e41;
-}
-input[type=text] {
+  }
+  input[type=text] {
     width: 35%;
     padding: 12px 20px;
     margin: 8px 0;
     box-sizing: border-box;
     border: 2px solid #ccc;
     border-radius: 4px;
-}
-
-input[type=text]:focus {
+  }
+  input[type=text]:focus {
     border: 2px solid #4CAF50;
+  }
+  @keyframes blink {
+    0% {
+      background-color: #F0f0f0;
+    }
+    100% {
+      background-color: #ff6964;
+    }
+  }
+  #flex {
+      max-width: 840px;
+    margin-left: 0 auto;
+    display: flex;
+  }
+  
+#EEW, #FORECAST {
+    width: 50%;
 }
 
-         @keyframes blink {
-           0% {
-             background-color: #F0f0f0;
-           }
-           100% {
-             background-color: #ff6964;
-           }
-         }
-    </style>
-</head>
+@media screen and (max-width: 805px) {
+    #EEW, #FORECAST {
+        width: 100%;
+    }
+}
+@media screen and (max-width: 800px) {
+    #FORECAST {
+        display: none;
+    }
+}
+</style>
 <body>
+  <div id="flex">
     <div id="EEW">
-        <h1>緊急地震速報</h1>
-        <div id="earthquake-info"></div>
+      <h1>緊急地震速報</h1>
+      <div id="earthquake-info"></div>
     </div>
-    <div id="EARTHQUAKEINFO">
-        <h2>地震情報</h2>
-        <div id="earthquake-list"></div>
+    <div id="FORECAST">
+      <h2>地域ごとの予想震度</h2>
+      <div id="forecast-info"></div>
     </div>
-    <div id="Settings">
-        <h2>現在地</h2>
-        <label for="user-location">現在地:</label>
-        <input type="text" id="user-location">
-        <button id="save-button">保存</button><p id="location"></p>
-        <label>
-  <input type="checkbox" id="notificationCheckbox">
-  通知を許可する
-</label>
-        <label>
-  <input type="checkbox" id="accuracyCheckbox">
-  確からしさを表示する ※高度な知識が必要です。
-  </label>
-  <label>
-  <input type="checkbox" id="showAllCheckbox">
-  精度が低い緊急地震速報を表示する
-</label>
-<div id="performance"></div>
-    </div>
+  </div>
+  <div id="EARTHQUAKEINFO">
+    <h2>地震情報</h2>
+    <div id="earthquake-list"></div>
+  </div>
+  <div id="Settings">
+    <h2>現在地</h2>
+    <label for="user-location">現在地:</label>
+    <input type="text" id="user-location">
+    <button id="save-button">保存</button><p id="location"></p>
+    <label>
+      <input type="checkbox" id="notificationCheckbox">
+      通知を許可する
+    </label>
+    <label>
+      <input type="checkbox" id="accuracyCheckbox">
+      確からしさを表示する ※高度な知識が必要です。
+    </label>
+    <label>
+      <input type="checkbox" id="showAllCheckbox">
+      精度が低い緊急地震速報を表示する
+    </label>
+    <div id="performance"></div>
+    <div id="runTime"></div>
       <script>
 let lastReportNums = {};
+let lastExecutionTime = null
 let lastReportTime = null;
 const earthquakeWarnings = {};
 const currentTime = Date.now();
@@ -256,12 +276,15 @@ for (const eventId in earthquakeWarnings) {
         delete earthquakeWarnings[eventId];
     }
 }
-
 const earthquakeInfo = document.getElementById('earthquake-info');
+const forecastInfo = document.getElementById('forecast-info');
+
 let info = '';
+let forecast = '';
 const warnings = Object.values(earthquakeWarnings).sort((a, b) => new Date(b.report_time) - new Date(a.report_time));
 if (warnings.length === 0) {
     info += `<p>緊急地震速報は発表されていません。</p>`;
+    forecast += `<p>なし</p>`;
 } else {
     for (let i = 0; i < warnings.length; i++) {
         const warning = warnings[i];
@@ -269,128 +292,132 @@ if (warnings.length === 0) {
         if (warnings.length > 1) {
             info += `<p class="large">(${i + 1}/${warnings.length})</p>`;
         }
-            console.log(warning)
-            if (warning.iscancel) {
-                info += `<p>緊急地震速報は取り消されました。</p>`;
-                    if (notificationCheckbox.checked && Notification.permission === 'granted') {
+        console.log(warning)
+        if (warning.iscancel) {
+            info += `<p>緊急地震速報は取り消されました。</p>`;
+            if (notificationCheckbox.checked && Notification.permission === 'granted') {
                 sendNotification(warning)
-                }
-            } else {
+            }
+        } else {
             info += ` <p>${warning.iswarn ? '緊急地震速報(警報)' : '緊急地震速報(予報)'}</p> <p>震源地: ${warning.hypocenter}</p> <p>${warning.isfinal ? ((warning.reportnum) ? `最終第${(warning.reportnum)}報` : '最終報') : ((warning.reportnum) ? `第${(warning.reportnum)}報` : '未定義')}</p> <p>`;
-if (warning.isLevel) {
-    info += `<p>強い揺れ</p>`;        
-} else if (warning.maxintensity === "不明") {
-    info += `<p>予想最大震度: 未発表または1未満</p>`;
-} else {
-    info += `<p>予想最大震度: ${warning.maxintensity}</p>`;
-}
+            if (warning.isLevel) {
+                info += `<p>強い揺れ</p>`;
+            } else if (warning.maxintensity === "不明") {
+                info += `<p>予想最大震度: 未発表または1未満</p>`;
+            } else {
+                info += `<p>予想最大震度: ${warning.maxintensity}</p>`;
+            }
 
             const userLocation = getUserLocationFromCookie();
-if (userLocation) {
-    if (warning.maxintensity) {
-        const maxIntensity = warning.maxintensity;
-        if ((warning.isIedred && warning.iswarn) || (!warning.isIedred && maxIntensity >= 4)) {
-            const userLocationData = warning.forecast.find(area => area.chiiki === userLocation);
-            if (userLocationData) {
-                info += `<p>現在地(${userLocation})の予想震度: ${userLocationData.shindomax}</p>`;
-                warning.expectedIntensity = userLocationData.shindomax;
-            } else {
-                info += `<p>現在地(${userLocation})の予想震度: 不明</p>`;
-                warning.expectedIntensity = '不明';
-            }
-        } else {
-            info += `<p>現在地(${userLocation})の予想震度: 不明</p>`;
-            warning.expectedIntensity = '不明';
-        }
-    } else {
-        info += `<p>現在地(${userLocation})の予想震度: 不明</p>`;
-        warning.expectedIntensity = '不明';
-    }
-}
-
-switch (true) {
-    case warning.isLevel:
-        info += `<p>${warning.origin_time}頃検知</p> <p>レベル法による仮定震源要素のため、震源の深さおよびM不明</p>`;
-        break;
-    case !warning.isplumepicenter && !warning.isLevel:
-        info += ` <p>マグニチュード: ${warning.magnitude}</p> <p>深さ: ${(warning.depth ? (warning.depth + 'km') : warning.depth)}</p> `;
-        if (warning.origin_time) {
-            info += ` <p>${warning.origin_time} 発生</p> `;
-        } else {
-            info += ` <p>${warning.origin_time}頃検知</p> <p>仮定震源要素のため、震源の深さおよびM不明</p> `;
-        }
-        break;
-    }
-const epicenterAccuracyMap = {
-    1: 'P 波／S 波レベル越え、IPF 法（1 点）、または仮定震源要素',
-    2: 'IPF 法（2 点）',
-    3: 'IPF 法（3 点／4 点）',
-    4: 'IPF 法（5 点以上）',
-    5: '防災科研システム (4点以以下)',
-    6: '防災科研システム（5 点以上）',
-    7: 'EPOS（海域〔観測網外〕）',
-    8: 'EPOS（内陸〔観測網内〕）'
-};
-
-const magnitudeAccuracyMap = {
-    1: '未定義',
-    2: '防災科研システム',
-    3: '全点P相',
-    4: 'P相/全相混在',
-    5: '全点全相',
-    6: 'EPOS',
-    7: '未定義',
-    8: 'P 波／S 波レベル越え、IPF 法（1 点）、または仮定震源要素'
-};
-
-if (accuracyCheckbox.checked && warning.Accuracy_epicenter) {
-    const epicenterAccuracy = epicenterAccuracyMap[warning.Accuracy_epicenter] || '不明';
-    const depthAccuracy = epicenterAccuracyMap[warning.Accuracy_depth] || '不明';
-    const magnitudeAccuracy = magnitudeAccuracyMap[warning.Accuracy_magnitude] || '不明';
-    info += `<p>精度情報 震源: ${epicenterAccuracy}, 深さ: ${depthAccuracy}, マグニチュード: ${magnitudeAccuracy}</p>`;
-}
-      
-        if (warning.isIedred) {
-            info += `API: iedred`;
-        } else {
-            info += `API: wolfx`;
-        }
-            if (warning.forecast && warning.forecast.length > 0) {
-                info += `<p>地域ごとの予想震度(気象庁発表)</p><p>`;
-                for (const area of warning.forecast) {
-                    info += `${area.chiiki} ${area.shindomax}`;
-                    if (area.isWarn) {
-                        info += ` - 警報`;
+            if (userLocation) {
+                if (warning.maxintensity) {
+                    const maxIntensity = warning.maxintensity;
+                    if ((warning.isIedred && warning.iswarn) || (!warning.isIedred && maxIntensity >= 4)) {
+                        const userLocationData = warning.forecast.find(area => area.chiiki === userLocation);
+                        if (userLocationData) {
+                            info += `<p>現在地(${userLocation})の予想震度: ${userLocationData.shindomax}</p>`;
+                            warning.expectedIntensity = userLocationData.shindomax;
+                        } else {
+                            info += `<p>現在地(${userLocation})の予想震度: 不明</p>`;
+                            warning.expectedIntensity = '不明';
+                        }
+                    } else {
+                        info += `<p>現在地(${userLocation})の予想震度: 不明</p>`;
+                        warning.expectedIntensity = '不明';
                     }
-                    info += `<br>`;
+                } else {
+                    info += `<p>現在地(${userLocation})の予想震度: 不明</p>`;
+                    warning.expectedIntensity = '不明';
                 }
-                info += `</p>`;
+            }
+
+            switch (true) {
+                case warning.isLevel:
+                    info += `<p>${warning.origin_time}頃検知</p> <p>レベル法による仮定震源要素のため、震源の深さおよびM不明</p>`;
+                    break;
+                case !warning.isplumepicenter && !warning.isLevel:
+                    info += ` <p>マグニチュード: ${warning.magnitude}</p> <p>深さ: ${(warning.depth ? (warning.depth + 'km') : warning.depth)}</p> `;
+                    if (warning.origin_time) {
+                        info += ` <p>${warning.origin_time} 発生</p> `;
+                    } else {
+                        info += ` <p>${warning.origin_time}頃検知</p> <p>仮定震源要素のため、震源の深さおよびM不明</p> `;
+                    }
+                    break;
+            }
+
+            const epicenterAccuracyMap = {
+                1: 'P 波／S 波レベル越え、IPF 法（1 点）、または仮定震源要素',
+                2: 'IPF 法（2 点）',
+                3: 'IPF 法（3 点／4 点）',
+                4: 'IPF 法（5 点以上）',
+                5: '防災科研システム (4点以以下)',
+                6: '防災科研システム（5 点以上）',
+                7: 'EPOS（海域〔観測網外〕）',
+                8: 'EPOS（内陸〔観測網内〕）'
+            };
+
+            const magnitudeAccuracyMap = {
+                1: '未定義',
+                2: '防災科研システム',
+                3: '全点P相',
+                4: 'P相/全相混在',
+                5: '全点全相',
+                6: 'EPOS',
+                7: '未定義',
+                8: 'P 波／S 波レベル越え、IPF 法（1 点）、または仮定震源要素'
+            };
+
+            if (accuracyCheckbox.checked && warning.Accuracy_epicenter) {
+                const epicenterAccuracy = epicenterAccuracyMap[warning.Accuracy_epicenter] || '不明';
+                const depthAccuracy = epicenterAccuracyMap[warning.Accuracy_depth] || '不明';
+                const magnitudeAccuracy = magnitudeAccuracyMap[warning.Accuracy_magnitude] || '不明';
+                info += `<p>精度情報 震源: ${epicenterAccuracy},<br> 深さ: ${depthAccuracy},<br> マグニチュード: ${magnitudeAccuracy}</p>`;
+            }
+
+            if (warning.isIedred) {
+                info += `API: iedred`;
             } else {
-                info += `<p>地域ごとの予想震度(気象庁発表): 未発表</p>`;
+                info += `API: wolfx`;
+            }
+            if (warning.forecast && warning.forecast.length > 0) {
+                forecast += `地域ごとの予想震度(気象庁発表)<br>`;
+                for (const area of warning.forecast) {
+                    forecast += `${area.chiiki} ${area.shindomax}`;
+                    if (area.isWarn) {
+                        forecast += ` - 警報`;
+                    }
+                    forecast += `<br>`;
+                }
+                forecast += `</p>`;
+            } else {
+                forecast += `地域ごとの予想震度(気象庁発表): 未発表</p>`;
             }
             if (notificationCheckbox.checked && Notification.permission === 'granted') {
-            sendNotification(warning)
-            }
+                sendNotification(warning)
+                console.log(forecast)
             }
         }
     }
+}
 
-    earthquakeInfo.innerHTML = info;
-    if (warnings.some(warning => warning.iswarn)) {
-        document.body.classList.add('warn');
-    } else {
-        document.body.classList.remove('warn');
-    }
+earthquakeInfo.innerHTML = info;
+forecastInfo.innerHTML = forecast;
+if (warnings.some(warning => warning.iswarn)) {
+    document.body.classList.add('warn');
+} else {
+    document.body.classList.remove('warn');
+}
 
 const endTime = performance.now();
 const elapsedTime = endTime - startTime;
 
 performanceElement.innerHTML = `処理にかかった時間: ${elapsedTime.toFixed(2)}ミリ秒`;
+  if (lastExecutionTime) {
+    const elapsed1Time = Date.now() - lastExecutionTime;
+    document.getElementById('runTime').textContent = `前回の実行時間との差: ${elapsed1Time}ms`;
+  }
+    lastExecutionTime = Date.now();
 }
-const endTime = performance.now();
-const elapsedTime = endTime - startTime;
-
-console.log(`mainの実行時間: ${elapsedTime}ミリ秒`);
 
 function sendNotification(warning) {
     console.log(warning)
