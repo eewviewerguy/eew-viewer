@@ -83,8 +83,11 @@
     display: flex;
   }
   
-#EEW, #FORECAST {
-    width: 50%;
+#EEW {
+    width: 60%;
+}
+#FORECAST {
+    width: 40%;
 }
 
 @media screen and (max-width: 805px) {
@@ -105,7 +108,7 @@
       <div id="earthquake-info"></div>
     </div>
     <div id="FORECAST">
-      <h2>地域ごとの予想震度</h2>
+      <h1>地域ごとの予想震度</h1>
       <div id="forecast-info"></div>
     </div>
   </div>
@@ -160,7 +163,7 @@ window.onload = function() {
         const reportTime = new Date(warning.report_time);
         if (warning.iscancel && currentTime - reportTime > 15000) {
             delete earthquakeWarnings[eventId];
-        } else if (currentTime - reportTime > 300000) {
+        } else if (currentTime - reportTime > 180000) {
             delete earthquakeWarnings[eventId];
         }
     }
@@ -179,12 +182,22 @@ const performanceElement = document.getElementById('performance');
 const startTime = performance.now();
 
 let latestData;
-if (data1.Warn && new Date(data1.AnnouncedTime.String) >= new Date(data2.AnnouncedTime)) {
-    latestData = {...data1, isIedred: true};
-} else if (new Date(data1.AnnouncedTime.String) <= new Date(data2.AnnouncedTime)) {
+if (new Date(data1.AnnouncedTime.String) < new Date(data2.AnnouncedTime)) {
     latestData = {...data2, isIedred: false};
-} else {
+} else if (new Date(data1.AnnouncedTime.String) > new Date(data2.AnnouncedTime)) {
     latestData = {...data1, isIedred: true};
+} else {
+    if (data1.serial < data2.serial) {
+        latestData = {...data2, isIedred: false};
+    } else if (data1.serial > data2.serial) {
+        latestData = {...data1, isIedred: true};
+    } else {
+        if (data1.Warn) {
+            latestData = {...data1, isIedred: true};
+        } else {
+            latestData = {...data2, isIedred: false};
+        }
+    }
 }
 
     if (latestData.isIedred) {
@@ -260,7 +273,7 @@ if (transformedData) {
     const reportTime = new Date(transformedData.report_time);
     if (!showAllEEW && transformedData.Accuracy_epicenter === 1) {
         delete earthquakeWarnings[eventId];
-    } else if (showAllEEW && currentTime - reportTime <= 300000) {
+    } else if (showAllEEW && currentTime - reportTime <= 180000) {
         earthquakeWarnings[eventId] = transformedData;
     } else {
         delete earthquakeWarnings[eventId];
@@ -273,7 +286,7 @@ for (const eventId in earthquakeWarnings) {
     const reportTime = new Date(warning.report_time);
     if (warning.iscancel && currentTime - reportTime > 15000) {
         delete earthquakeWarnings[eventId];
-    } else if (currentTime - reportTime > 300000) {
+    } else if (currentTime - reportTime > 180000) {
         delete earthquakeWarnings[eventId];
     }
 }
@@ -381,7 +394,6 @@ if (warnings.length === 0) {
                 info += `API: wolfx`;
             }
             if (warning.forecast && warning.forecast.length > 0) {
-                forecast += `地域ごとの予想震度(気象庁発表)<br>`;
                 for (const area of warning.forecast) {
                     forecast += `${area.chiiki} ${area.shindomax}`;
                     if (area.isWarn) {
@@ -389,14 +401,15 @@ if (warnings.length === 0) {
                     }
                     forecast += `<br>`;
                 }
-                forecast += `</p>`;
             } else {
-                forecast += `地域ごとの予想震度(気象庁発表): 未発表</p>`;
+                forecast += `未発表</p>`;
             }
             if (notificationCheckbox.checked && Notification.permission === 'granted') {
                 sendNotification(warning)
                 console.log(forecast)
             }
+
+
         }
     }
 }
