@@ -117,7 +117,7 @@
     <div id="earthquake-list"></div>
   </div>
   <div id="Settings">
-    <h2>現在地</h2>
+    <h2>設定</h2>
     <label for="user-location">現在地:</label>
     <input type="text" id="user-location">
     <button id="save-button">保存</button><p id="location"></p>
@@ -133,6 +133,14 @@
       <input type="checkbox" id="showAllCheckbox">
       精度が低い緊急地震速報を表示する
     </label>
+            <label>
+      <input type="checkbox" id="useApiEndpoint1a">
+      iedred apiを使用する
+    </label>
+        <label>
+      <input type="checkbox" id="useApiEndpoint2b">
+      wolfx apiを使用する
+      </label>
     <div id="performance"></div>
     <div id="runTime"></div>
       <script>
@@ -173,32 +181,59 @@ window.onload = function() {
 async function main() {
     const apiEndpoint1 = 'https://api.iedred7584.com/eew/json/';
     const apiEndpoint2 = 'https://api.wolfx.jp/jma_eew.json';
-    const data1 = await getData(apiEndpoint1);
-    const data2 = await getData(apiEndpoint2);
+    const useApiEndpoint1c = localStorage.getItem('useApiEndpoint1') === 'true';
+    const useApiEndpoint2d = localStorage.getItem('useApiEndpoint2') === 'true';
+    let data1;
+    let data2;
+
+    if (useApiEndpoint1c && useApiEndpoint2d) {
+        data1 = await getData(apiEndpoint1);
+        data2 = await getData(apiEndpoint2);
+    } else if (useApiEndpoint1c) {
+        data1 = await getData(apiEndpoint1);
+    } else if (useApiEndpoint2d) {
+        data2 = await getData(apiEndpoint2);
+    }
+    
     const currentTime = Date.now();
     const earthquakeWarnings = JSON.parse(localStorage.getItem('earthquakeWarnings')) || {};
 
-const performanceElement = document.getElementById('performance');
-const startTime = performance.now();
+    const performanceElement = document.getElementById('performance');
+    const startTime = performance.now();
 
-let latestData;
-if (new Date(data1.AnnouncedTime.String) < new Date(data2.AnnouncedTime)) {
-    latestData = {...data2, isIedred: false};
-} else if (new Date(data1.AnnouncedTime.String) > new Date(data2.AnnouncedTime)) {
-    latestData = {...data1, isIedred: true};
-} else {
-    if (data1.serial < data2.serial) {
-        latestData = {...data2, isIedred: false};
-    } else if (data1.serial > data2.serial) {
-        latestData = {...data1, isIedred: true};
-    } else {
-        if (data1.Warn) {
+    let latestData;
+    if (data1 && data2) {
+        if (new Date(data1.AnnouncedTime.String) < new Date(data2.AnnouncedTime)) {
+            latestData = {...data2, isIedred: false};
+        } else if (new Date(data1.AnnouncedTime.String) > new Date(data2.AnnouncedTime)) {
             latestData = {...data1, isIedred: true};
         } else {
-            latestData = {...data2, isIedred: false};
+            if (data1.serial < data2.serial) {
+                latestData = {...data2, isIedred: false};
+            } else if (data1.serial > data2.serial) {
+                latestData = {...data1, isIedred: true};
+            } else {
+                if (data1.Warn) {
+                    latestData = {...data1, isIedred: true};
+                } else {
+                    latestData = {...data2, isIedred: false};
+                }
+            }
         }
+    } else if (data1) {
+        latestData = {...data1, isIedred: true};
+    } else if (data2) {
+        latestData = {...data2, isIedred: false};
     }
-}
+
+        const earthquakeInfo = document.getElementById('earthquake-info');
+　　　　const forecastInfo = document.getElementById('forecast-info');
+　　　　
+    if (!latestData) {
+        earthquakeInfo.innerHTML = '<p>緊急地震速報の受信が設定でオフになっています。</p>';
+        forecastInfo.innerHTML = '<p>オフ</p>'
+        return;
+    }
 
     if (latestData.isIedred) {
         const rkIndex = latestData.OriginalText.indexOf('RK');
@@ -290,11 +325,10 @@ for (const eventId in earthquakeWarnings) {
         delete earthquakeWarnings[eventId];
     }
 }
-const earthquakeInfo = document.getElementById('earthquake-info');
-const forecastInfo = document.getElementById('forecast-info');
 
 let info = '';
 let forecast = '';
+console.log(transformedData)
 const warnings = Object.values(earthquakeWarnings).sort((a, b) => new Date(b.report_time) - new Date(a.report_time));
 if (warnings.length === 0) {
     info += `<p>緊急地震速報は発表されていません。</p>`;
@@ -546,6 +580,37 @@ showAllCheckbox.addEventListener('change', () => {
     showAllEEW = showAllCheckbox.checked;
     localStorage.setItem('showAllEEW', JSON.stringify(showAllEEW));
 });
+
+const useApiEndpoint1a = document.querySelector('#useApiEndpoint1a');
+
+// チェックボックスの状態をローカルストレージから読み込む
+const useApiEndpoint1 = localStorage.getItem('useApiEndpoint1');
+if (useApiEndpoint1 === 'true') {
+    useApiEndpoint1a.checked = true;
+} else {
+    useApiEndpoint1a.checked = false;
+}
+
+// チェックボックスがチェックされたときに、ローカルストレージに保存する
+useApiEndpoint1a.addEventListener('change', () => {
+    localStorage.setItem('useApiEndpoint1', useApiEndpoint1a.checked);
+});
+
+const useApiEndpoint2b = document.querySelector('#useApiEndpoint2b');
+
+// チェックボックスの状態をローカルストレージから読み込む
+const useApiEndpoint2 = localStorage.getItem('useApiEndpoint2');
+if (useApiEndpoint2 === 'true') {
+    useApiEndpoint2b.checked = true;
+} else {
+    useApiEndpoint2b.checked = false;
+}
+
+// チェックボックスがチェックされたときに、ローカルストレージに保存する
+useApiEndpoint2b.addEventListener('change', () => {
+    localStorage.setItem('useApiEndpoint2', useApiEndpoint2b.checked);
+});
+
 
 async function getEarthquakeInformation() {
     try {
