@@ -208,9 +208,9 @@ async function main() {
         } else if (new Date(data1.AnnouncedTime.String) > new Date(data2.AnnouncedTime)) {
             latestData = {...data1, isIedred: true};
         } else {
-            if (data1.serial < data2.serial) {
+            if (data1.Serial < data2.Serial) {
                 latestData = {...data2, isIedred: false};
-            } else if (data1.serial > data2.serial) {
+            } else if (data1.Serial > data2.Serial) {
                 latestData = {...data1, isIedred: true};
             } else {
                 if (data1.Warn) {
@@ -220,12 +220,7 @@ async function main() {
                 }
             }
         }
-    } else if (data1) {
-        latestData = {...data1, isIedred: true};
-    } else if (data2) {
-        latestData = {...data2, isIedred: false};
     }
-
         const earthquakeInfo = document.getElementById('earthquake-info');
 　　　　const forecastInfo = document.getElementById('forecast-info');
 　　　　
@@ -259,7 +254,7 @@ async function main() {
             Accuracy_epicenter: rk[0],
             Accuracy_depth: rk[1],
             Accuracy_magnitude: rk[2],
-            isLevel: latestData.Title.Code === "35" && parseInt(latestData.Maxintensity.String) === 5,
+            isLevel: (latestData.Title.Code === "35" && parseInt(latestData.Maxintensity.String) === 5 && latestData.Warn),
             forecast: (latestData.Forecast || []).map(item => ({
                 chiiki: item.Intensity.Name,
                 shindomax: item.Intensity.From,
