@@ -254,7 +254,7 @@ async function main() {
             Accuracy_epicenter: rk[0],
             Accuracy_depth: rk[1],
             Accuracy_magnitude: rk[2],
-            isLevel: (latestData.Title.Code === "35" && parseInt(latestData.Maxintensity.String) === 5 && latestData.Warn),
+            isLevel: (latestData.Title.Code === "35" && parseInt(latestData.Maxintensity.String) === 5 && !latestData.Warn),
             forecast: (latestData.Forecast || []).map(item => ({
                 chiiki: item.Intensity.Name,
                 shindomax: item.Intensity.From,
