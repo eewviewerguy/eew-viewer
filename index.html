@@ -144,91 +144,6 @@
     <div id="performance"></div>
     <div id="runTime"></div>
       <script>
-let lastReportNums = {};
-let lastExecutionTime = null
-let lastReportTime = null;
-const earthquakeWarnings = {};
-const currentTime = Date.now();
-const startTime = performance.now();
-
-async function getData(apiEndpoint) {
-    try {
-        const response = await fetch(apiEndpoint, {
-            cache: 'no-store'
-        });
-
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error(error);
-    }
-}
-window.onload = function() {
-    const earthquakeWarnings = JSON.parse(localStorage.getItem('earthquakeWarnings')) || {};
-    const currentTime = new Date();
-    for (const eventId in earthquakeWarnings) {
-        const warning = earthquakeWarnings[eventId];
-        const reportTime = new Date(warning.report_time);
-        if (warning.iscancel && currentTime - reportTime > 15000) {
-            delete earthquakeWarnings[eventId];
-        } else if (currentTime - reportTime > 180000) {
-            delete earthquakeWarnings[eventId];
-        }
-    }
-    localStorage.setItem('earthquakeWarnings', JSON.stringify(earthquakeWarnings));
-};
-
-async function main() {
-    let latestData;
-    const apiEndpoint1 = 'https://api.iedred7584.com/eew/json/';
-    const apiEndpoint2 = 'https://api.wolfx.jp/jma_eew.json';
-    const useApiEndpoint1c = localStorage.getItem('useApiEndpoint1') === 'true';
-    const useApiEndpoint2d = localStorage.getItem('useApiEndpoint2') === 'true';
-    let data1;
-    let data2;
-
-    if (useApiEndpoint1c && useApiEndpoint2d) {
-        data1 = await getData(apiEndpoint1);
-        data2 = await getData(apiEndpoint2);
-    } else if (useApiEndpoint1c) {
-        latestData = await getData(apiEndpoint1);
-    } else if (useApiEndpoint2d) {
-        latestData = await getData(apiEndpoint2);
-    }
-    
-    const currentTime = Date.now();
-    const earthquakeWarnings = JSON.parse(localStorage.getItem('earthquakeWarnings')) || {};
-
-    const performanceElement = document.getElementById('performance');
-    const startTime = performance.now();
-
-    if (data1 && data2 && useApiEndpoint1c && useApiEndpoint2d) {
-        if (new Date(data1.AnnouncedTime.String) < new Date(data2.AnnouncedTime)) {
-            latestData = {...data2, isIedred: false};
-        } else if (new Date(data1.AnnouncedTime.String) > new Date(data2.AnnouncedTime)) {
-            latestData = {...data1, isIedred: true};
-        } else {
-            if (data1.Serial < data2.Serial) {
-                latestData = {...data2, isIedred: false};
-            } else if (data1.Serial > data2.Serial) {
-                latestData = {...data1, isIedred: true};
-            } else {
-                if (data1.Warn) {
-                    latestData = {...data1, isIedred: true};
-                } else {
-                    latestData = {...data2, isIedred: false};
-                }
-            }
-        }
-    }
-        const earthquakeInfo = document.getElementById('earthquake-info');
-　　　　const forecastInfo = document.getElementById('forecast-info');
-　　　　
-    if (!latestData) {
-        earthquakeInfo.innerHTML = '<p>緊急地震速報の受信が設定でオフになっています。</p>';
-        forecastInfo.innerHTML = '<p>オフ</p>'
-        return;
-    }
 const regions = {
   100: '石狩地方北部',
   101: '石狩地方中部',
@@ -419,6 +334,91 @@ const regions = {
   807: '沖縄県西表島',
   806: '沖縄県与那国島',
 };
+let lastReportNums = {};
+let lastExecutionTime = null
+let lastReportTime = null;
+const earthquakeWarnings = {};
+const currentTime = Date.now();
+const startTime = performance.now();
+
+async function getData(apiEndpoint) {
+    try {
+        const response = await fetch(apiEndpoint, {
+            cache: 'no-store'
+        });
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+}
+window.onload = function() {
+    const earthquakeWarnings = JSON.parse(localStorage.getItem('earthquakeWarnings')) || {};
+    const currentTime = new Date();
+    for (const eventId in earthquakeWarnings) {
+        const warning = earthquakeWarnings[eventId];
+        const reportTime = new Date(warning.report_time);
+        if (warning.iscancel && currentTime - reportTime > 15000) {
+            delete earthquakeWarnings[eventId];
+        } else if (currentTime - reportTime > 180000) {
+            delete earthquakeWarnings[eventId];
+        }
+    }
+    localStorage.setItem('earthquakeWarnings', JSON.stringify(earthquakeWarnings));
+};
+
+async function main() {
+    let latestData;
+    const apiEndpoint1 = 'https://api.iedred7584.com/eew/json/';
+    const apiEndpoint2 = 'https://api.wolfx.jp/jma_eew.json';
+    const useApiEndpoint1c = localStorage.getItem('useApiEndpoint1') === 'true';
+    const useApiEndpoint2d = localStorage.getItem('useApiEndpoint2') === 'true';
+    let data1;
+    let data2;
+
+    if (useApiEndpoint1c && useApiEndpoint2d) {
+        data1 = await getData(apiEndpoint1);
+        data2 = await getData(apiEndpoint2);
+    } else if (useApiEndpoint1c) {
+        latestData = await getData(apiEndpoint1);
+    } else if (useApiEndpoint2d) {
+        latestData = await getData(apiEndpoint2);
+    }
+    
+    const currentTime = Date.now();
+    const earthquakeWarnings = JSON.parse(localStorage.getItem('earthquakeWarnings')) || {};
+
+    const performanceElement = document.getElementById('performance');
+    const startTime = performance.now();
+
+    if (data1 && data2 && useApiEndpoint1c && useApiEndpoint2d) {
+        if (new Date(data1.AnnouncedTime.String) < new Date(data2.AnnouncedTime)) {
+            latestData = {...data2, isIedred: false};
+        } else if (new Date(data1.AnnouncedTime.String) > new Date(data2.AnnouncedTime)) {
+            latestData = {...data1, isIedred: true};
+        } else {
+            if (data1.Serial < data2.Serial) {
+                latestData = {...data2, isIedred: false};
+            } else if (data1.Serial > data2.Serial) {
+                latestData = {...data1, isIedred: true};
+            } else {
+                if (data1.Warn) {
+                    latestData = {...data1, isIedred: true};
+                } else {
+                    latestData = {...data2, isIedred: false};
+                }
+            }
+        }
+    }
+        const earthquakeInfo = document.getElementById('earthquake-info');
+　　　　const forecastInfo = document.getElementById('forecast-info');
+　　　　
+    if (!latestData) {
+        earthquakeInfo.innerHTML = '<p>緊急地震速報の受信が設定でオフになっています。</p>';
+        forecastInfo.innerHTML = '<p>オフ</p>'
+        return;
+    }
 
 const text = latestData.OriginalText;
 const pattern = /EBI\s+(\d{3}\s+S(\d{4}|\d[-+]\d[-+]|(\d[-+])?\d{2})\s+(\d{6}|\/\/\/\/\/\/)\s+\d{2}\s)+/g;
@@ -430,10 +430,14 @@ while ((match = pattern.exec(text)) !== null) {
         let chiiki = regions[item.slice(0, 3)];
         let shindomax = item.slice(5, 7);
         let shindolowest = item.slice(7, 9);
+        let isWarn = item.slice(17, 18) === '1';
+        let isPlum = item.slice(18, 19) === '9';
         forecasts.push({
             chiiki,
             shindomax,
             shindolowest,
+            isWarn,
+            isPlum,
         });
     }
 }
@@ -551,12 +555,12 @@ if (warnings.length === 0) {
                 info += `<p>予想最大震度: ${warning.maxintensity}</p>`;
             }
 
-            const userLocation = getUserLocationFromCookie();
-            let shindomax2 = null;
+const userLocation = getUserLocationFromCookie();
+           let shindomax2 = null;
             if (userLocation) {
                 if (warning.maxintensity) {
                     const maxIntensity = warning.maxintensity;
-                    if ((warning.isIedred && warning.iswarn) || (!warning.isIedred && maxIntensity >= 4)) {
+                    if (warning.forecast && warning.forecast.length > 0) {
                         const userLocationData = warning.forecast.find(area => area.chiiki === userLocation);
                         if (userLocationData) {
                         shindomax2 = userLocationData.shindomax.replace('0', '').replace('-', '弱').replace('+', '強');
@@ -575,6 +579,7 @@ if (warnings.length === 0) {
                     warning.expectedIntensity = '不明';
                 }
             }
+
 
             switch (true) {
                 case warning.isLevel:
@@ -639,18 +644,24 @@ if (warning.forecast && warning.forecast.length > 0) {
             shindomax = shindomax.replace('+', '') + '強';
         }
         forecast += `${chiiki} ${shindomax}`;
+        if (area.isWarn) {
+            forecast += ` - 警報`;
+        }
         forecast += `<br>`;
     }
 } else {
     forecast += `未発表</p>`;
 }
-
-
+            if (notificationCheckbox.checked && Notification.permission === 'granted') {
+                sendNotification(warning)
+            }
  }
 }
+
 }
 
 earthquakeInfo.innerHTML = info;
+
 forecastInfo.innerHTML = forecast;
 if (warnings.some(warning => warning.iswarn)) {
     document.body.classList.add('warn');
