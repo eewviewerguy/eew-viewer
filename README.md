@@ -1,8 +1,8 @@
 ![](https://img.shields.io/github/downloads/eewviewerguy/eew-viewer/total)
 ### EEW VIEWER
 EEW VIEWERは、JavaScriptを使用したウェブサイトです。このサイトは、APIを情報源に、緊急地震速報と地震情報を表示しています。
-![例1](root/images/1.png)
-![例2](root/images/2.png)
+![](root/images/1.png "例1")
+![](root/images/2.png "例2")
 ### 特徴
 - シンプルなデザイン
 - スマートフォンやPCなど、ブラウザが動作するデバイスで利用可能
