@@ -3,7 +3,6 @@
    <head>
       <title>緊急地震速報</title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="google-site-verification" content="gyPW_sOWL_GIseoOumtEviE4nMQccDGH6DFWVhQwhzo" />
       <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
       <meta http-equiv="Pragma" content="no-cache">
       <meta http-equiv="Expires" content="0">
@@ -22,6 +21,7 @@
     backdrop-filter: blur(5px);
     background-color: white;
     max-width: 800px;
+    max-height: 620px;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   }
@@ -84,11 +84,43 @@
     display: flex;
   }
   
+.warning-box.intensity-4 {
+    background-color: #fae696;
+    color: black;
+}
+
+.warning-box.intensity-5-weak {
+    background-color: #ffe600;
+    color: black;
+}
+
+.warning-box.intensity-5-strong {
+    background-color: #ff9900;
+    color: black;
+}
+
+.warning-box.intensity-6-weak {
+    background-color: #ff2800;
+    color: white;
+}
+
+.warning-box.intensity-6-strong {
+    background-color: #a50021;
+    color: white;
+}
+
+.warning-box.intensity-7 {
+    background-color: #b40068;
+    color: white;
+}
+  
 #EEW {
     width: 60%;
 }
 #FORECAST {
     width: 40%;
+    max-height: 620px;
+    overflow-y: auto;
 }
 
 @media screen and (max-width: 805px) {
@@ -355,6 +387,8 @@ async function getData(apiEndpoint) {
     }
 }
 
+
+
 window.onload = function() {
     const earthquakeWarnings = JSON.parse(localStorage.getItem('earthquakeWarnings')) || {};
     const currentTime = new Date();
@@ -363,12 +397,15 @@ window.onload = function() {
         const reportTime = new Date(warning.report_time);
         if (warning.iscancel && currentTime - reportTime > 15000) {
             delete earthquakeWarnings[eventId];
-        } else if (currentTime - reportTime > 180000) {
+        } else if (currentTime - reportTime > 18000000) {
             delete earthquakeWarnings[eventId];
         }
     }
     localStorage.setItem('earthquakeWarnings', JSON.stringify(earthquakeWarnings));
 };
+
+let currentWarningIndex = 0;
+let updateCount = 0;
 
 async function main() {
     let latestData;
@@ -423,11 +460,11 @@ async function main() {
     }
 
 const text = latestData.OriginalText;
-const pattern = /EBI\s+(\d{3}\s+S(\d{4}|\d[-+]\d[-+]|(\d[-+])?\d{2})\s+(\d{6}|\/\/\/\/\/\/)\s+\d{2}\s)+/g;
+const pattern = /EBI\s+(\d{3}\s+S(\d{4}|\d[-+]\d[-+]|(\d[-+])?\d{2}|\d{3}[-+])\s+(\d{6}|\/\/\/\/\/\/)\s+\d{2}\s)+/g;
 let forecasts = [];
 let match;
 while ((match = pattern.exec(text)) !== null) {
-    let ebiArray = match[0].match(/\d{3}\s+S(\d{4}|\d[-+]\d[-+]|(\d[-+])?\d{2})\s+(\d{6}|\/\/\/\/\/\/)\s+\d{2}\s/g);
+    let ebiArray = match[0].match(/\d{3}\s+S(\d{4}|\d[-+]\d[-+]|(\d[-+])?\d{2}|\d{3}[-+])\s+(\d{6}|\/\/\/\/\/\/)\s+\d{2}\s/g);
     for (let item of ebiArray) {
         let chiiki = regions[item.slice(0, 3)];
         let shindomax = item.slice(5, 7);
@@ -500,45 +537,43 @@ transformedData = {
     forecast: forecasts,
 };
     }
-
-
-
-if (transformedData) {
-    const eventId = transformedData.EventID;
-    const reportTime = new Date(transformedData.report_time);
-    if (!showAllEEW && transformedData.Accuracy_epicenter === 1) {
-        delete earthquakeWarnings[eventId];
-    } else if (showAllEEW && currentTime - reportTime <= 180000) {
-        earthquakeWarnings[eventId] = transformedData;
-    } else {
-        delete earthquakeWarnings[eventId];
-    }
-    localStorage.setItem('earthquakeWarnings', JSON.stringify(earthquakeWarnings));
-}
-
-for (const eventId in earthquakeWarnings) {
-    const warning = earthquakeWarnings[eventId];
-    const reportTime = new Date(warning.report_time);
-    if (warning.iscancel && currentTime - reportTime > 15000) {
-        delete earthquakeWarnings[eventId];
-    } else if (currentTime - reportTime > 180000) {
-        delete earthquakeWarnings[eventId];
-    }
-}
-
-let info = '';
-let forecast = '';
-const warnings = Object.values(earthquakeWarnings).sort((a, b) => new Date(b.report_time) - new Date(a.report_time));
-if (warnings.length === 0) {
-    info += `<p>緊急地震速報は発表されていません。</p>`;
-    forecast += `<p>なし</p>`;
-} else {
-    for (let i = 0; i < warnings.length; i++) {
-        const warning = warnings[i];
-        info += `<div class="warning-box" id="EEW[${warning.EventID}]">`;
-        if (warnings.length > 1) {
-            info += `<p class="large">(${i + 1}/${warnings.length})</p>`;
+    if (transformedData) {
+        const eventId = transformedData.EventID;
+        const reportTime = new Date(transformedData.report_time);
+        if (!showAllEEW && transformedData.Accuracy_epicenter === 1) {
+            delete earthquakeWarnings[eventId];
+        } else if (showAllEEW && currentTime - reportTime <= 180000) {
+            earthquakeWarnings[eventId] = transformedData;
+        } else {
+            delete earthquakeWarnings[eventId];
         }
+        localStorage.setItem('earthquakeWarnings', JSON.stringify(earthquakeWarnings));
+    }
+
+    for (const eventId in earthquakeWarnings) {
+        const warning = earthquakeWarnings[eventId];
+        const reportTime = new Date(warning.report_time);
+        if (warning.iscancel && currentTime - reportTime > 15000) {
+            delete earthquakeWarnings[eventId];
+        } else if (currentTime - reportTime > 180000) {
+            delete earthquakeWarnings[eventId];
+        }
+    }
+
+    let info = '';
+    let forecast = '';
+    const warnings = Object.values(earthquakeWarnings).sort((a, b) => new Date(b.report_time) - new Date(a.report_time));
+    if (warnings.length === 0) {
+        info += `<p>緊急地震速報は発表されていません。</p>`;
+        forecast += `<p>なし</p>`;
+    } else {
+        updateCount++;
+        if (updateCount % 2 === 0) {
+            currentWarningIndex = (currentWarningIndex + 1) % warnings.length;
+        }
+        const warning = warnings[currentWarningIndex];
+        info += `<div class="warning-box" id="EEW[${warning.EventID}]">`;
+        info += `<p class="large">(${currentWarningIndex + 1}/${warnings.length})</p>`;
         console.log(warning)
         if (warning.iscancel) {
             info += `<p>緊急地震速報は取り消されました。</p>`;
@@ -579,6 +614,7 @@ const userLocation = getUserLocationFromCookie();
                     warning.expectedIntensity = '不明';
                 }
             }
+        }
 
 
             switch (true) {
@@ -640,17 +676,41 @@ if (warning.forecast && warning.forecast.length > 0) {
         if (shindomax.startsWith('0')) {
             shindomax = shindomax.slice(1);
         }
-        if (shindomax.includes('-')) {
+                if (shindomax.includes('-')) {
             shindomax = shindomax.replace('-', '') + '弱';
         }
         if (shindomax.includes('+')) {
             shindomax = shindomax.replace('+', '') + '強';
         }
-        forecast += `${chiiki} ${shindomax}`;
-        if (area.isWarn) {
-            forecast += ` - 警報`;
+        let intensityClass = "";
+        if (shindomax === "4") {
+            intensityClass = "intensity-4";
+        } else if (shindomax === "5弱") {
+            intensityClass = "intensity-5-weak";
+        } else if (shindomax === "5強") {
+            intensityClass = "intensity-5-strong";
+        } else if (shindomax === "6弱") {
+            intensityClass = "intensity-6-weak";
+        } else if (shindomax === "6強") {
+            intensityClass = "intensity-6-strong";
+        } else if (shindomax === "7") {
+            intensityClass = "intensity-7";
         }
-        forecast += `<br>`;
+        
+        let warningBoxClass = `warning-box ${intensityClass}`;
+        
+        let warningBox = `<div class="${warningBoxClass}">${chiiki} 震度${shindomax}`;
+        
+        if (area.isWarn) {
+            warningBox += ` - 警報`;
+        }
+        if (area.isPlum) {
+            warningBox += `<br>PLUM法による予想震度`
+        }
+        
+        warningBox += `</div>`;
+        
+        forecast += warningBox;
     }
 } else if (!forecast) {
     forecast += `未発表</p>`;
@@ -659,12 +719,8 @@ if (notificationCheckbox.checked && Notification.permission === 'granted') {
     sendNotification(warning)
 }
 }
-}
-
-}
 
 earthquakeInfo.innerHTML = info;
-
 forecastInfo.innerHTML = forecast;
 if (warnings.some(warning => warning.iswarn)) {
     document.body.classList.add('warn');
