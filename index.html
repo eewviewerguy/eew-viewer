@@ -577,6 +577,7 @@ transformedData = {
         console.log(warning)
         if (warning.iscancel) {
             info += `<p>緊急地震速報は取り消されました。</p>`;
+            forecast += `<p>取り消し</p>`;
             if (notificationCheckbox.checked && Notification.permission === 'granted') {
                 sendNotification(warning)
             }
@@ -614,7 +615,6 @@ const userLocation = getUserLocationFromCookie();
                     warning.expectedIntensity = '不明';
                 }
             }
-        }
 
 
             switch (true) {
@@ -665,7 +665,8 @@ const userLocation = getUserLocationFromCookie();
             } else {
                 info += `API: wolfx`;
             }
-            
+        }      
+        if (!warning.isCancel) {
 if (warning.forecast && warning.forecast.length > 0) {
     if (forecast.includes('未発表')) {
         forecast = forecast.replace('未発表', '');
@@ -714,6 +715,7 @@ if (warning.forecast && warning.forecast.length > 0) {
     }
 } else if (!forecast) {
     forecast += `未発表</p>`;
+}
 }
 if (notificationCheckbox.checked && Notification.permission === 'granted') {
     sendNotification(warning)
