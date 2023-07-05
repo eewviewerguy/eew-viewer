@@ -7,11 +7,6 @@ EEW VIEWERは、JavaScriptを使用したウェブサイトです。このサイ
 ### 特徴
 - シンプルなデザイン
 - スマートフォンやPCなど、ブラウザが動作するデバイスで利用可能
-### eew-viewer-map について
-- P波・S波の円も予報業務許可の対象になるという[情報](https://twitter.com/isidai/status/1676121747006033920)があったため、動向を確認するため一時的に2023年7月8日程度まで非公開にしています。
-   申し訳ありません。
-- ただしその[情報](https://twitter.com/isidai/status/1676121747006033920)はあくまで ***予報業務許可の対象になる***という話であり、許可が必要という意味ではないと思えますが
-   念のため非公開にしています。
 ### 情報源
 - 緊急地震速報: [api.wolfx ©Wolfx Studio](https://api.wolfx.jp), api.iedred7584.com
 - 地震情報: [nTool Earthquake API Narikakun Network](https://nTool.online)
