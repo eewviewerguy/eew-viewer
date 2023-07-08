@@ -537,28 +537,23 @@ transformedData = {
     forecast: forecasts,
 };
     }
-    if (transformedData) {
-        const eventId = transformedData.EventID;
-        const reportTime = new Date(transformedData.report_time);
-        if (!showAllEEW && transformedData.Accuracy_epicenter === 1) {
-            delete earthquakeWarnings[eventId];
-        } else if (showAllEEW && currentTime - reportTime <= 180000) {
-            earthquakeWarnings[eventId] = transformedData;
-        } else {
-            delete earthquakeWarnings[eventId];
-        }
-        localStorage.setItem('earthquakeWarnings', JSON.stringify(earthquakeWarnings));
+if (transformedDatainmain) {
+    const eventId = transformedDatainmain.EventID;
+    const reportTime = new Date(transformedDatainmain.report_time);
+    if (showAllEEW && currentTime - reportTime <= 180000) {
+        earthquakeWarnings[eventId] = transformedDatainmain;
     }
+}
 
-    for (const eventId in earthquakeWarnings) {
-        const warning = earthquakeWarnings[eventId];
-        const reportTime = new Date(warning.report_time);
-        if (warning.iscancel && currentTime - reportTime > 15000) {
-            delete earthquakeWarnings[eventId];
-        } else if (currentTime - reportTime > 180000) {
-            delete earthquakeWarnings[eventId];
-        }
+Object.keys(earthquakeWarnings).forEach(eventId => {
+    const warning = earthquakeWarnings[eventId];
+    const reportTime = new Date(warning.report_time);
+    if ((reportTime.getTime() === new Date(transformedDatainmain.report_time).getTime() && currentTime - reportTime > 180000) || (warning.iscancel === true && currentTime - reportTime > 15000)) {
+        delete earthquakeWarnings[eventId];
     }
+});
+localStorage.setItem('earthquakeWarnings', JSON.stringify(earthquakeWarnings));
+
 
     let info = '';
     let forecast = '';
