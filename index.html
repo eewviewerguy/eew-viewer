@@ -572,7 +572,7 @@ localStorage.setItem('earthquakeWarnings', JSON.stringify(earthquakeWarnings));
         console.log(warning)
         if (warning.iscancel) {
             info += `<p>緊急地震速報は取り消されました。</p>`;
-            forecast += `<p>取り消し</p>`;
+            forecast = `<p>取り消し</p>`;
             if (notificationCheckbox.checked && Notification.permission === 'granted') {
                 sendNotification(warning)
             }
@@ -661,7 +661,7 @@ const userLocation = getUserLocationFromCookie();
                 info += `API: wolfx`;
             }
         }      
-        if (!warning.isCancel) {
+        if (!warning.iscancel) {
 if (warning.forecast && warning.forecast.length > 0) {
     if (forecast.includes('未発表')) {
         forecast = forecast.replace('未発表', '');
